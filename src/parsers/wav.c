@@ -1,5 +1,5 @@
 #include "parsers/wav.h"
-#include "io_utils.h"
+#include "common/io_utils.h"
 
 #include <stdio.h>
 #include <stdlib.h>
