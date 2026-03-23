@@ -42,3 +42,7 @@ int io_write_u32_le(FILE *fp, unsigned long value) {
 
     return io_write_bytes(fp, b, 4);
 }
+
+int io_write_s32_le(FILE * fp, int value){
+    return io_write_u32_le(fp, (unsigned long)((unsigned int)value));
+}
