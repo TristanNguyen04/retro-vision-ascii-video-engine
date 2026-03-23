@@ -127,7 +127,7 @@ BmpError bmp_load(const char * filename, BmpImage * bmp){
     );
 
     if(err != BMP_OK){
-        fclose(err);
+        fclose(fp);
         return err;
     }
 
