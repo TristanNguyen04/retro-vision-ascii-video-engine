@@ -1,6 +1,8 @@
 #ifndef WAV_H
 #define WAV_H
 
+#include "common/io_utils.h"
+
 /**
  * Support WAV subset:
  * - RIFF/WAVE

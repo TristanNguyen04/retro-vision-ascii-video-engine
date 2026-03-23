@@ -1,5 +1,5 @@
 #include "parsers/wav.h"
-#include "tests_helper.h"
+#include "../tests_helper.h"
 
 #include <stdio.h>
 #include <string.h>
