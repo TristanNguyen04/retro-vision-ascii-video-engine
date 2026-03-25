@@ -186,7 +186,12 @@ static JsonError json_read_file(const char * filename, char ** buffer, size_t * 
         return JSON_ERR_READ_FAILED;
     }
 
-    *buffer = (char *) malloc((size_t) file_size + 1U);
+    if(fseek(fp, 0L, SEEK_SET) != 0){
+        fclose(fp);
+        return JSON_ERR_READ_FAILED;
+    }
+
+    *buffer = (char *) malloc((size_t)file_size + 1U);
     if(*buffer == NULL){
         fclose(fp);
         return JSON_ERR_MEMORY;
@@ -195,7 +200,7 @@ static JsonError json_read_file(const char * filename, char ** buffer, size_t * 
     bytes_read = fread(*buffer, 1U, (size_t)file_size, fp);
     fclose(fp);
 
-    if(bytes_read != (size_t) file_size){
+    if(bytes_read != (size_t)file_size){
         free(*buffer);
         *buffer = NULL;
         return JSON_ERR_READ_FAILED;
