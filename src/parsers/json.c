@@ -76,7 +76,7 @@ JsonError json_load(const char * filename, JsonObject * obj){
 
     err = json_parse_object(&parser, obj);
     if(err != JSON_OK){
-        freE(buffer);
+        free(buffer);
         json_free(obj);
         return err;
     }
