@@ -1,6 +1,6 @@
 #include "parsers/json/json.h"
 #include "common/io_utils.h"
-#include "../tests_helper.h"
+#include "../../tests_helper.h"
 
 #include <stdio.h>
 
