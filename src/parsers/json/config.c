@@ -173,7 +173,7 @@ static void config_apply_defaults(EngineConfig * config){
     config->frame_prefix[strlen(CONFIG_DEFAULT_FRAME_PREFIX)] = '\0';
 
     strncpy(config->frame_extension, CONFIG_DEFAULT_FRAME_EXTENSION, strlen(CONFIG_DEFAULT_FRAME_EXTENSION) + 1);
-    config->frame_prefix[strlen(CONFIG_DEFAULT_FRAME_EXTENSION)] = '\0';
+    config->frame_extension[strlen(CONFIG_DEFAULT_FRAME_EXTENSION)] = '\0';
 
     config->frame_digits = CONFIG_DEFAULT_FRAME_DIGITS;
 }
