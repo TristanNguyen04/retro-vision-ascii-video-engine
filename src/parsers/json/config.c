@@ -55,83 +55,83 @@ ConfigError config_load(const char * filename, EngineConfig * config){
         return CONFIG_ERR_JSON_LOAD;
     }
 
-    json_err = config_validate_allowed_keys(&obj);
-    if(json_err != CONFIG_OK){
+    config_err = config_validate_allowed_keys(&obj);
+    if(config_err != CONFIG_OK){
         json_free(&obj);
         config_init(config);
-        return json_err;
+        return config_err;
     }
 
     config_apply_defaults(config);
 
-    json_err = config_get_string(&obj, "frames_dir", config->frames_dir, sizeof(config->frames_dir), 0);
-    if(json_err != JSON_OK){
+    config_err = config_get_string(&obj, "frames_dir", config->frames_dir, sizeof(config->frames_dir), 0);
+    if(config_err != CONFIG_OK){
         json_free(&obj);
         config_init(config);
-        return json_err;
+        return config_err;
     }
 
-    json_err = config_get_uint(&obj, "fps", &config->fps, 0);
-    if(json_err != JSON_OK){
+    config_err = config_get_uint(&obj, "fps", &config->fps, 0);
+    if(config_err != CONFIG_OK){
         json_free(&obj);
         config_init(config);
-        return json_err;
+        return config_err;
     }
     
-    json_err = config_get_uint(&obj, "start_frame", &config->start_frame, 0);
-    if(json_err != JSON_OK){
+    config_err = config_get_uint(&obj, "start_frame", &config->start_frame, 0);
+    if(config_err != CONFIG_OK){
         json_free(&obj);
         config_init(config);
-        return json_err;
+        return config_err;
     }
 
-    json_err = config_get_uint(&obj, "end_frame", &config->end_frame, 0);
-    if(json_err != JSON_OK){
+    config_err = config_get_uint(&obj, "end_frame", &config->end_frame, 0);
+    if(config_err != CONFIG_OK){
         json_free(&obj);
         config_init(config);
-        return json_err;
+        return config_err;
     }
 
-    json_err = config_get_string(&obj, "palette", config->palette, sizeof(config->palette), 0);
-    if(json_err != JSON_OK){
+    config_err = config_get_string(&obj, "palette", config->palette, sizeof(config->palette), 0);
+    if(config_err != CONFIG_OK){
         json_free(&obj);
         config_init(config);
-        return json_err;
+        return config_err;
     }
 
-    json_err = config_get_uint(&obj, "threshold", &config->threshold, 0);
-    if(json_err != JSON_OK){
+    config_err = config_get_uint(&obj, "threshold", &config->threshold, 0);
+    if(config_err != CONFIG_OK){
         json_free(&obj);
         config_init(config);
-        return json_err;
+        return config_err;
     }
 
-    json_err = config_get_string(&obj, "frame_prefix", config->frame_prefix, sizeof(config->frame_prefix), 1);
-    if(json_err != JSON_OK){
+    config_err = config_get_string(&obj, "frame_prefix", config->frame_prefix, sizeof(config->frame_prefix), 1);
+    if(config_err != CONFIG_OK){
         json_free(&obj);
         config_init(config);
-        return json_err;
+        return config_err;
     }
 
-    json_err = config_get_string(&obj, "frame_extension", config->frame_extension, sizeof(config->frame_extension), 1);
-    if(json_err != JSON_OK){
+    config_err = config_get_string(&obj, "frame_extension", config->frame_extension, sizeof(config->frame_extension), 1);
+    if(config_err != CONFIG_OK){
         json_free(&obj);
         config_init(config);
-        return json_err;
+        return config_err;
     }
 
-    json_err = config_get_uint(&obj, "frame_digits", &config->frame_digits, 1);
-    if(json_err != JSON_OK){
+    config_err = config_get_uint(&obj, "frame_digits", &config->frame_digits, 1);
+    if(config_err != CONFIG_OK){
         json_free(&obj);
         config_init(config);
-        return json_err;
+        return config_err;
     }
 
-    json_err = config_validate(config);
-    if(json_err != JSON_OK){
+    config_err = config_validate(config);
+    if(config_err != CONFIG_OK){
         json_free(&obj);
         config_init(config);
-        return json_err;
+        return config_err;
     }
 
     json_free(&obj);
