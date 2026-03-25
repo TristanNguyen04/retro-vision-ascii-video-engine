@@ -24,7 +24,7 @@ $(OBJDIR)/wav.o: src/parsers/wav.c include/parsers/wav.h include/common/io_utils
 $(OBJDIR)/bmp.o: src/parsers/bmp.c include/parsers/bmp.h include/common/io_utils.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c src/parsers/bmp.c -o $(OBJDIR)/bmp.o
 
-$(OBJDIR)/bmp.o: src/parsers/json.c include/parsers/json.h include/common/io_utils.h | $(OBJDIR)
+$(OBJDIR)/json.o: src/parsers/json.c include/parsers/json.h include/common/io_utils.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c src/parsers/json.c -o $(OBJDIR)/json.o
 
 $(OBJDIR)/tests/tests_helper.o: tests/tests_helper.c tests/tests_helper.h | $(OBJDIR)/tests
