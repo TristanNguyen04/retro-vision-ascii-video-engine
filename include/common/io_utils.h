@@ -12,4 +12,6 @@ int io_write_u16_le(FILE *fp, unsigned int value);
 int io_write_u32_le(FILE *fp, unsigned long value);
 int io_write_s32_le(FILE * fp, int value);
 
+int io_write_text_file(const char *filename, const char *text);
+
 #endif
