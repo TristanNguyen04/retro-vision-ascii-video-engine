@@ -1,0 +1,8 @@
+{
+  "frames_dir": "frames",
+  "fps": 30,
+  "start_frame": 1,
+  "end_frame": 21,
+  "palette": "@#*+=-:.",
+  "threshold": 12
+}
