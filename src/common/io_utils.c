@@ -46,3 +46,27 @@ int io_write_u32_le(FILE *fp, unsigned long value) {
 int io_write_s32_le(FILE * fp, int value){
     return io_write_u32_le(fp, (unsigned long)((unsigned int)value));
 }
+
+int io_write_text_file(const char *filename, const char *text) {
+    FILE *fp;
+    size_t length;
+
+    if (filename == NULL || text == NULL) {
+        return 0;
+    }
+
+    fp = fopen(filename, "wb");
+    if (fp == NULL) {
+        return 0;
+    }
+
+    length = strlen(text);
+
+    if (!io_write_bytes(fp, text, length)) {
+        fclose(fp);
+        return 0;
+    }
+
+    fclose(fp);
+    return 1;
+}
