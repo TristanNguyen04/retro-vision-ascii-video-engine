@@ -91,7 +91,7 @@ SequenceError sequence_build_frame_path(
     if(err != SEQUENCE_OK){
         return err;
     }
-    
+
     if(!sequence_is_valid_frame_number(config, frame_number)){
         return SEQUENCE_ERR_INVALID_FRAME_NUMBER;
     }
@@ -106,8 +106,6 @@ SequenceError sequence_build_frame_path(
         frame_number,
         config->frame_extension
     );
-
-    
 
     if(written < 0 || (size_t)written >= out_size){
         if(out_size > 0U){
