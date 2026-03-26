@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Werror -ansi -pedantic -Iinclude
 OBJDIR = build
 
-OBJ = $(OBJDIR)/io_utils.o $(OBJDIR)/wav.o $(OBJDIR)/bmp.o $(OBJDIR)/json.o $(OBJDIR)/config.o $(OBJDIR)/sequence.o $(OBJDIR)/ascii.o 
+OBJ = $(OBJDIR)/io_utils.o $(OBJDIR)/wav.o $(OBJDIR)/bmp.o $(OBJDIR)/json.o $(OBJDIR)/config.o $(OBJDIR)/sequence.o $(OBJDIR)/ascii.o $(OBJDIR)/render.o
 TEST_SUPPORT = $(OBJDIR)/tests/tests_helper.o
 
 .PHONY: all clean re test run_test
@@ -35,6 +35,9 @@ $(OBJDIR)/sequence.o: src/components/sequence.c include/components/sequence.h sr
 
 $(OBJDIR)/ascii.o: src/components/ascii.c include/components/ascii.h src/parsers/bmp.c include/parsers/bmp.h include/common/io_utils.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c src/components/ascii.c -o $(OBJDIR)/ascii.o
+
+$(OBJDIR)/render.o: src/components/render.c include/components/render.h src/components/ascii.c include/components/ascii.h src/parsers/bmp.c include/parsers/bmp.h include/common/io_utils.h | $(OBJDIR)
+	$(CC) $(CFLAGS) -c src/components/render.c -o $(OBJDIR)/render.o
 
 $(OBJDIR)/tests/tests_helper.o: tests/tests_helper.c tests/tests_helper.h | $(OBJDIR)/tests
 	$(CC) $(CFLAGS) -c tests/tests_helper.c -o $(OBJDIR)/tests/tests_helper.o
