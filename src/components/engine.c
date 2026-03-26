@@ -177,6 +177,15 @@ EngineError engine_run(
                 }
 
                 break;
+            
+            case ENGINE_STATE_WRITE_SUMMARY:
+                if(!engine_log_summary(&ctx)){
+                    ctx.error = ENGINE_ERR_LOG_WRITE;
+                    ctx.state = ENGINE_STATE_ERROR;
+                } else {
+                    ctx.state = ENGINE_STATE_DONE;
+                }
+                break;
 
             default:
                 ctx.error = ENGINE_ERR_INTERNAL;

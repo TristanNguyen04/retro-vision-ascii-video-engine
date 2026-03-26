@@ -43,6 +43,8 @@ unsigned int ascii_grayscale_from_bgr(
     /**
      * Integer approximation of:
      *  gray = 0.299*r + 0.587*g + 0.114*b
+     * 
+     * See: https://www.dynamsoft.com/blog/insights/image-processing/image-processing-101-color-space-conversion/
      */
     return (299U *(unsigned int)r +
            587U * (unsigned int)g + 
