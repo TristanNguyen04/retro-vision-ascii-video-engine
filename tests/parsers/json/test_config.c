@@ -677,9 +677,9 @@ static int test_config_load_empty_palette(void) {
 }
 
 static int test_config_error_string(void) {
-    return strcmp(config_error_string(CONFIG_OK), "success") == 0 &&
-           strcmp(config_error_string(CONFIG_ERR_UNKNOWN_KEY), "unknown config key") == 0 &&
-           strcmp(config_error_string(CONFIG_ERR_INVALID_RANGE), "invalid config range") == 0;
+    return strcmp(config_error_string(CONFIG_OK), "[CONFIG_PARSER] success") == 0 &&
+           strcmp(config_error_string(CONFIG_ERR_UNKNOWN_KEY), "[CONFIG_PARSER] unknown config key") == 0 &&
+           strcmp(config_error_string(CONFIG_ERR_INVALID_RANGE), "[CONFIG_PARSER] invalid config range") == 0;
 }
 
 int main(void) {

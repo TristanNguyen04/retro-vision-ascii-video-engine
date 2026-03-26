@@ -308,11 +308,11 @@ static int test_sequence_build_frame_path_small_buffer(void) {
 }
 
 static int test_sequence_error_string(void) {
-    return strcmp(sequence_error_string(SEQUENCE_OK), "success") == 0 &&
+    return strcmp(sequence_error_string(SEQUENCE_OK), "[SEQUENCE] success") == 0 &&
            strcmp(sequence_error_string(SEQUENCE_ERR_INVALID_CONFIG),
-                  "invalid sequence config") == 0 &&
+                  "[SEQUENCE] invalid sequence config") == 0 &&
            strcmp(sequence_error_string(SEQUENCE_ERR_PATH_TOO_LONG),
-                  "sequence path too long") == 0;
+                  "[SEQUENCE] sequence path too long") == 0;
 }
 
 int main(void) {

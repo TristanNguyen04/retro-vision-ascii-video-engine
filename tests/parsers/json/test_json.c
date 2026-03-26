@@ -481,8 +481,8 @@ static int test_json_find_pair_missing_key(void) {
 }
 
 static int test_json_error_string(void) {
-    return strcmp(json_error_string(JSON_OK), "success") == 0 &&
-           strcmp(json_error_string(JSON_ERR_DUPLICATE_KEY), "duplicate key") == 0;
+    return strcmp(json_error_string(JSON_OK), "[JSON_PARSER] success") == 0 &&
+           strcmp(json_error_string(JSON_ERR_DUPLICATE_KEY), "[JSON_PARSER] duplicate key") == 0;
 }
 
 int main(void) {

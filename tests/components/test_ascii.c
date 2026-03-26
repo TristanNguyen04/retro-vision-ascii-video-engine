@@ -320,9 +320,9 @@ static int test_ascii_render_image_with_highlight_changes_output(void) {
 }
 
 static int test_ascii_error_string(void) {
-    return strcmp(ascii_error_string(ASCII_OK), "success") == 0 &&
+    return strcmp(ascii_error_string(ASCII_OK), "[ASCII] success") == 0 &&
            strcmp(ascii_error_string(ASCII_ERR_INVALID_PALETTE),
-                  "invalid ASCII palette") == 0;
+                  "[ASCII] invalid ASCII palette") == 0;
 }
 
 int main(void) {

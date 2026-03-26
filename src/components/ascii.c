@@ -149,20 +149,20 @@ AsciiError ascii_render_image_with_highlight(
 const char * ascii_error_string(AsciiError err){
     switch(err){
         case ASCII_OK:
-            return "success";
+            return "[ASCII] success";
         case ASCII_ERR_NULL_ARG:
-            return "null argument";
+            return "[ASCII] null argument";
         case ASCII_ERR_INVALID_IMAGE:
-            return "invalid BMP image";
+            return "[ASCII] invalid BMP image";
         case ASCII_ERR_INVALID_PALETTE:
-            return "invalid ASCII palette";
+            return "[ASCII] invalid ASCII palette";
         case ASCII_ERR_MEMORY:
-            return "memory allocation failed";
+            return "[ASCII] memory allocation failed";
         default:
             break;
     }
 
-    return "unknown ASCII error";
+    return "[ASCII] unknown ASCII error";
 }
 
 static void ascii_reset(AsciiFrame * frame){

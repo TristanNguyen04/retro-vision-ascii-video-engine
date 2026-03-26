@@ -120,22 +120,22 @@ SequenceError sequence_build_frame_path(
 const char * sequence_error_string(SequenceError err){
     switch(err){
         case SEQUENCE_OK:
-            return "success";
+            return "[SEQUENCE] success";
         case SEQUENCE_ERR_NULL_ARG:
-            return "null argument";
+            return "[SEQUENCE] null argument";
         case SEQUENCE_ERR_INVALID_CONFIG:
-            return "invalid sequence config";
+            return "[SEQUENCE] invalid sequence config";
         case SEQUENCE_ERR_INVALID_FRAME_NUMBER:
-            return "invalid frame number";
+            return "[SEQUENCE] invalid frame number";
         case SEQUENCE_ERR_INVALID_RANGE:
-            return "invalid frame range";
+            return "[SEQUENCE] invalid frame range";
         case SEQUENCE_ERR_PATH_TOO_LONG:
-            return "sequence path too long";
+            return "[SEQUENCE] sequence path too long";
         default:
             break;
     }
 
-    return "unknown sequence error";
+    return "[SEQUENCE] unknown sequence error";
 }
 
 static int sequence_is_valid_frame_number(const EngineConfig * config, unsigned int frame_number){

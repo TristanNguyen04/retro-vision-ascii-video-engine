@@ -223,40 +223,40 @@ BmpError bmp_read_row(
 const char * bmp_error_string(BmpError err){
     switch (err) {
         case BMP_OK:
-            return "success";
+            return "[BMP_PARSER] success";
         case BMP_ERR_NULL_ARG:
-            return "null argument";
+            return "[BMP_PARSER] null argument";
         case BMP_ERR_OPEN_FAILED:
-            return "failed to open BMP file";
+            return "[BMP_PARSER] failed to open BMP file";
         case BMP_ERR_READ_FAILED:
-            return "failed to read BMP file";
+            return "[BMP_PARSER] failed to read BMP file";
         case BMP_ERR_SEEK_FAILED:
-            return "failed to seek in BMP file";
+            return "[BMP_PARSER] failed to seek in BMP file";
         case BMP_ERR_BAD_SIGNATURE:
-            return "invalid BMP signature";
+            return "[BMP_PARSER] invalid BMP signature";
         case BMP_ERR_UNSUPPORTED_DIB:
-            return "unsupported DIB header";
+            return "[BMP_PARSER] unsupported DIB header";
         case BMP_ERR_UNSUPPORTED_PLANES:
-            return "unsupported BMP plane count";
+            return "[BMP_PARSER] unsupported BMP plane count";
         case BMP_ERR_UNSUPPORTED_COMPRESSION:
-            return "unsupported BMP compression";
+            return "[BMP_PARSER] unsupported BMP compression";
         case BMP_ERR_UNSUPPORTED_BITS:
-            return "unsupported BMP bits per pixel";
+            return "[BMP_PARSER] unsupported BMP bits per pixel";
         case BMP_ERR_INVALID_DIMENSIONS:
-            return "invalid BMP dimensions";
+            return "[BMP_PARSER] invalid BMP dimensions";
         case BMP_ERR_INVALID_OFFSET:
-            return "invalid BMP pixel offset";
+            return "[BMP_PARSER] invalid BMP pixel offset";
         case BMP_ERR_ROW_SIZE_OVERFLOW:
-            return "BMP row size overflow";
+            return "[BMP_PARSER] BMP row size overflow";
         case BMP_ERR_IMAGE_SIZE_OVERFLOW:
-            return "BMP image size overflow";
+            return "[BMP_PARSER] BMP image size overflow";
         case BMP_ERR_MEMORY:
-            return "memory allocation failed";
+            return "[BMP_PARSER] memory allocation failed";
         default:
             break;
     }
 
-    return "unknown BMP error";
+    return "[BMP_PARSER] unknown BMP error";
 }
 
 static void bmp_reset(BmpImage *bmp) {

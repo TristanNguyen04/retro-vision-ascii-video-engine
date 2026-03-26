@@ -214,38 +214,38 @@ WavError wav_load(const char * filename, WavFile * wav){
 const char * wav_error_string(WavError err){
     switch(err){
         case WAV_OK:
-            return "success";
+            return "[WAV_PARSER] success";
         case WAV_ERR_NULL_ARG:
-            return "null argument";
+            return "[WAV_PARSER] null argument";
         case WAV_ERR_OPEN_FAILED:
-            return "failed to open WAV file";
+            return "[WAV_PARSER] failed to open WAV file";
         case WAV_ERR_READ_FAILED:
-            return "failed to read WAV file";
+            return "[WAV_PARSER] failed to read WAV file";
         case WAV_ERR_SEEK_FAILED:
-            return "failed to seek in WAV file";
+            return "[WAV_PARSER] failed to seek in WAV file";
         case WAV_ERR_BAD_RIFF:
-            return "invalid RIFF header";
+            return "[WAV_PARSER] invalid RIFF header";
         case WAV_ERR_BAD_WAVE:
-            return "invalid WAVE header";
+            return "[WAV_PARSER] invalid WAVE header";
         case WAV_ERR_MISSING_FMT:
-            return "missing fmt chunk";
+            return "[WAV_PARSER] missing fmt chunk";
         case WAV_ERR_MISSING_DATA:
-            return "missing data chunk";
+            return "[WAV_PARSER] missing data chunk";
         case WAV_ERR_UNSUPPORTED_FORMAT:
-            return "unsupported WAV format";
+            return "[WAV_PARSER] unsupported WAV format";
         case WAV_ERR_UNSUPPORTED_BITS:
-            return "unsupported bits per sample";
+            return "[WAV_PARSER] unsupported bits per sample";
         case WAV_ERR_UNSUPPORTED_CHANNELS:
-            return "unsupported channel count";
+            return "[WAV_PARSER] unsupported channel count";
         case WAV_ERR_INVALID_BLOCK_ALIGN:
-            return "invalid block alignment";
+            return "[WAV_PARSER] invalid block alignment";
         case WAV_ERR_MEMORY:
-            return "memory allocation failed";
+            return "[WAV_PARSER] memory allocation failed";
         default:
             break;
     }
 
-    return "unknown WAV error";
+    return "[WAV_PARSER] unknown WAV error";
 }
 
 unsigned int wav_average_amplitude(const WavFile * wav, unsigned int start_sample, unsigned int end_sample){
