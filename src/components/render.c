@@ -100,6 +100,6 @@ const char * render_error_string(RenderError err){
             break;
     }
 
-    return "unknown render error";
+    return "[RENDER] unknown render error";
 }
 
