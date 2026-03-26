@@ -142,28 +142,28 @@ ConfigError config_load(const char * filename, EngineConfig * config){
 const char *config_error_string(ConfigError err) {
     switch (err) {
         case CONFIG_OK:
-            return "success";
+            return "[CONFIG_PARSER] success";
         case CONFIG_ERR_NULL_ARG:
-            return "null argument";
+            return "[CONFIG_PARSER] null argument";
         case CONFIG_ERR_JSON_LOAD:
-            return "failed to load JSON config";
+            return "[CONFIG_PARSER] failed to load JSON config";
         case CONFIG_ERR_MISSING_KEY:
-            return "missing required config key";
+            return "[CONFIG_PARSER] missing required config key";
         case CONFIG_ERR_UNKNOWN_KEY:
-            return "unknown config key";
+            return "[CONFIG_PARSER] unknown config key";
         case CONFIG_ERR_WRONG_TYPE:
-            return "wrong config value type";
+            return "[CONFIG_PARSER] wrong config value type";
         case CONFIG_ERR_STRING_TOO_LONG:
-            return "config string too long";
+            return "[CONFIG_PARSER] config string too long";
         case CONFIG_ERR_INVALID_VALUE:
-            return "invalid config value";
+            return "[CONFIG_PARSER] invalid config value";
         case CONFIG_ERR_INVALID_RANGE:
-            return "invalid config range";
+            return "[CONFIG_PARSER] invalid config range";
         default:
             break;
     }
 
-    return "unknown config error";
+    return "[CONFIG_PARSER] unknown config error";
 }
 
 static void config_apply_defaults(EngineConfig * config){

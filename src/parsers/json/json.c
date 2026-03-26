@@ -111,46 +111,46 @@ const JsonPair * json_find_pair(const JsonObject * obj, const char * key){
 const char *json_error_string(JsonError err) {
     switch (err) {
         case JSON_OK:
-            return "success";
+            return "[JSON_PARSER] success";
         case JSON_ERR_NULL_ARG:
-            return "null argument";
+            return "[JSON_PARSER] null argument";
         case JSON_ERR_OPEN_FAILED:
-            return "failed to open JSON file";
+            return "[JSON_PARSER] failed to open JSON file";
         case JSON_ERR_READ_FAILED:
-            return "failed to read JSON file";
+            return "[JSON_PARSER] failed to read JSON file";
         case JSON_ERR_MEMORY:
-            return "memory allocation failed";
+            return "[JSON_PARSER] memory allocation failed";
         case JSON_ERR_EMPTY_INPUT:
-            return "empty JSON input";
+            return "[JSON_PARSER] empty JSON input";
         case JSON_ERR_EXPECTED_OBJECT_START:
-            return "expected '{'";
+            return "[JSON_PARSER] expected '{'";
         case JSON_ERR_EXPECTED_STRING_KEY:
-            return "expected string key";
+            return "[JSON_PARSER] expected string key";
         case JSON_ERR_EXPECTED_COLON:
-            return "expected ':'";
+            return "[JSON_PARSER] expected ':'";
         case JSON_ERR_EXPECTED_VALUE:
-            return "expected value";
+            return "[JSON_PARSER] expected value";
         case JSON_ERR_EXPECTED_COMMA_OR_OBJECT_END:
-            return "expected ',' or '}'";
+            return "[JSON_PARSER] expected ',' or '}'";
         case JSON_ERR_DUPLICATE_KEY:
-            return "duplicate key";
+            return "[JSON_PARSER] duplicate key";
         case JSON_ERR_KEY_TOO_LONG:
-            return "JSON key too long";
+            return "[JSON_PARSER] JSON key too long";
         case JSON_ERR_STRING_TOO_LONG:
-            return "JSON string too long";
+            return "[JSON_PARSER] JSON string too long";
         case JSON_ERR_INVALID_STRING:
-            return "invalid JSON string";
+            return "[JSON_PARSER] invalid JSON string";
         case JSON_ERR_INVALID_NUMBER:
-            return "invalid JSON number";
+            return "[JSON_PARSER] invalid JSON number";
         case JSON_ERR_UNSUPPORTED_VALUE:
-            return "unsupported JSON value";
+            return "[JSON_PARSER] unsupported JSON value";
         case JSON_ERR_TRAILING_CONTENT:
-            return "trailing content after JSON object";
+            return "[JSON_PARSER] trailing content after JSON object";
         default:
             break;
     }
 
-    return "unknown JSON error";
+    return "[JSON_PARSER] unknown JSON error";
 }
 
 static void json_reset(JsonObject * obj){

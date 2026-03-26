@@ -568,8 +568,8 @@ static int test_bmp_read_row_top_down(void) {
 }
 
 static int test_bmp_error_string(void) {
-    return strcmp(bmp_error_string(BMP_OK), "success") == 0 &&
-           strcmp(bmp_error_string(BMP_ERR_BAD_SIGNATURE), "invalid BMP signature") == 0;
+    return strcmp(bmp_error_string(BMP_OK), "[BMP_PARSER] success") == 0 &&
+           strcmp(bmp_error_string(BMP_ERR_BAD_SIGNATURE), "[BMP_PARSER] invalid BMP signature") == 0;
 }
 
 int main(void) {
