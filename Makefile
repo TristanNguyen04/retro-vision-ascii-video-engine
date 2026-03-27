@@ -1,9 +1,25 @@
 CC = gcc
 CFLAGS = -Wall -Werror -ansi -pedantic -Iinclude
-OBJDIR = build
 
-OBJ = $(OBJDIR)/io_utils.o $(OBJDIR)/wav.o $(OBJDIR)/bmp.o $(OBJDIR)/json.o $(OBJDIR)/config.o $(OBJDIR)/sequence.o $(OBJDIR)/ascii.o $(OBJDIR)/render.o
-TEST_SUPPORT = $(OBJDIR)/tests/tests_helper.o
+OBJDIR = build
+TESTDIR = $(OBJDIR)/tests
+
+COMMON_SRC_DIR = src/common
+PARSER_SRC_DIR = src/parsers
+JSON_SRC_DIR = src/parsers/json
+COMPONENT_SRC_DIR = src/components
+
+COMMON_INC_DIR = include/common
+PARSER_INC_DIR = include/parsers
+JSON_INC_DIR = include/parsers/json
+COMPONENT_INC_DIR = include/components
+
+COMMON_OBJ = $(OBJDIR)/io_utils.o
+PARSER_OBJ = $(OBJDIR)/wav.o $(OBJDIR)/bmp.o $(OBJDIR)/json.o $(OBJDIR)/config.o
+COMPONENT_OBJ = $(OBJDIR)/sequence.o $(OBJDIR)/ascii.o $(OBJDIR)/render.o $(OBJDIR)/engine.o
+
+OBJ = $(COMMON_OBJ) $(PARSER_OBJ) $(COMPONENT_OBJ)
+TEST_SUPPORT = $(TESTDIR)/tests_helper.o
 
 .PHONY: all clean re test run_test
 
@@ -12,35 +28,45 @@ all: $(OBJ)
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
-$(OBJDIR)/tests:
-	mkdir -p $(OBJDIR)/tests
+$(TESTDIR):
+	mkdir -p $(TESTDIR)
 
-$(OBJDIR)/io_utils.o: src/common/io_utils.c include/common/io_utils.h | $(OBJDIR)
-	$(CC) $(CFLAGS) -c src/common/io_utils.c -o $(OBJDIR)/io_utils.o
+$(OBJDIR)/io_utils.o: $(COMMON_SRC_DIR)/io_utils.c $(COMMON_INC_DIR)/io_utils.h | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $(COMMON_SRC_DIR)/io_utils.c -o $(OBJDIR)/io_utils.o
 
-$(OBJDIR)/wav.o: src/parsers/wav.c include/parsers/wav.h include/common/io_utils.h | $(OBJDIR)
-	$(CC) $(CFLAGS) -c src/parsers/wav.c -o $(OBJDIR)/wav.o
+$(OBJDIR)/wav.o: $(PARSER_SRC_DIR)/wav.c $(PARSER_INC_DIR)/wav.h $(COMMON_INC_DIR)/io_utils.h | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $(PARSER_SRC_DIR)/wav.c -o $(OBJDIR)/wav.o
 
-$(OBJDIR)/bmp.o: src/parsers/bmp.c include/parsers/bmp.h include/common/io_utils.h | $(OBJDIR)
-	$(CC) $(CFLAGS) -c src/parsers/bmp.c -o $(OBJDIR)/bmp.o
+$(OBJDIR)/bmp.o: $(PARSER_SRC_DIR)/bmp.c $(PARSER_INC_DIR)/bmp.h $(COMMON_INC_DIR)/io_utils.h | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $(PARSER_SRC_DIR)/bmp.c -o $(OBJDIR)/bmp.o
 
-$(OBJDIR)/json.o: src/parsers/json/json.c include/parsers/json/json.h include/common/io_utils.h | $(OBJDIR)
-	$(CC) $(CFLAGS) -c src/parsers/json/json.c -o $(OBJDIR)/json.o
+$(OBJDIR)/json.o: $(JSON_SRC_DIR)/json.c $(JSON_INC_DIR)/json.h $(COMMON_INC_DIR)/io_utils.h | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $(JSON_SRC_DIR)/json.c -o $(OBJDIR)/json.o
 
-$(OBJDIR)/config.o: src/parsers/json/config.c include/parsers/json/config.h src/parsers/json/json.c include/parsers/json/json.h include/common/io_utils.h | $(OBJDIR)
-	$(CC) $(CFLAGS) -c src/parsers/json/config.c -o $(OBJDIR)/config.o
+$(OBJDIR)/config.o: $(JSON_SRC_DIR)/config.c $(JSON_INC_DIR)/config.h $(JSON_INC_DIR)/json.h | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $(JSON_SRC_DIR)/config.c -o $(OBJDIR)/config.o
 
-$(OBJDIR)/sequence.o: src/components/sequence.c include/components/sequence.h src/parsers/json/config.c include/parsers/json/config.h src/parsers/json/json.c include/parsers/json/json.h include/common/io_utils.h | $(OBJDIR)
-	$(CC) $(CFLAGS) -c src/components/sequence.c -o $(OBJDIR)/sequence.o
+$(OBJDIR)/sequence.o: $(COMPONENT_SRC_DIR)/sequence.c $(COMPONENT_INC_DIR)/sequence.h $(JSON_INC_DIR)/config.h | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/sequence.c -o $(OBJDIR)/sequence.o
 
-$(OBJDIR)/ascii.o: src/components/ascii.c include/components/ascii.h src/parsers/bmp.c include/parsers/bmp.h include/common/io_utils.h | $(OBJDIR)
-	$(CC) $(CFLAGS) -c src/components/ascii.c -o $(OBJDIR)/ascii.o
+$(OBJDIR)/ascii.o: $(COMPONENT_SRC_DIR)/ascii.c $(COMPONENT_INC_DIR)/ascii.h $(PARSER_INC_DIR)/bmp.h | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/ascii.c -o $(OBJDIR)/ascii.o
 
-$(OBJDIR)/render.o: src/components/render.c include/components/render.h src/components/ascii.c include/components/ascii.h src/parsers/bmp.c include/parsers/bmp.h include/common/io_utils.h | $(OBJDIR)
-	$(CC) $(CFLAGS) -c src/components/render.c -o $(OBJDIR)/render.o
+$(OBJDIR)/render.o: $(COMPONENT_SRC_DIR)/render.c $(COMPONENT_INC_DIR)/render.h $(COMPONENT_INC_DIR)/ascii.h | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/render.c -o $(OBJDIR)/render.o
 
-$(OBJDIR)/tests/tests_helper.o: tests/tests_helper.c tests/tests_helper.h | $(OBJDIR)/tests
-	$(CC) $(CFLAGS) -c tests/tests_helper.c -o $(OBJDIR)/tests/tests_helper.o
+$(OBJDIR)/engine.o: $(COMPONENT_SRC_DIR)/engine.c \
+	$(COMPONENT_INC_DIR)/engine.h \
+	$(COMPONENT_INC_DIR)/sequence.h \
+	$(COMPONENT_INC_DIR)/ascii.h \
+	$(COMPONENT_INC_DIR)/render.h \
+	$(PARSER_INC_DIR)/wav.h \
+	$(PARSER_INC_DIR)/bmp.h \
+	$(JSON_INC_DIR)/config.h | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/engine.c -o $(OBJDIR)/engine.o
+
+$(TESTDIR)/tests_helper.o: tests/tests_helper.c tests/tests_helper.h | $(TESTDIR)
+	$(CC) $(CFLAGS) -c tests/tests_helper.c -o $(TESTDIR)/tests_helper.o
 
 clean:
 	rm -rf $(OBJDIR)
@@ -48,16 +74,18 @@ clean:
 re: clean all
 
 # Usage:
-# make test TEST=tests/test_io_utils.c
+# make test TEST=tests/common/test_io_utils.c
+# make test TEST=tests/parsers/test_json.c
+# make run_test TEST=tests/components/test_sequence.c
 test: all $(TEST_SUPPORT)
 	@if [ -z "$(TEST)" ]; then \
 		echo "Usage: make test TEST=tests/common/test_io_utils.c"; \
 		exit 1; \
 	fi
-	$(CC) $(CFLAGS) -c $(TEST) -o $(OBJDIR)/tests/$(notdir $(basename $(TEST))).o
-	$(CC) $(CFLAGS) -o $(OBJDIR)/tests/$(notdir $(basename $(TEST))) \
-		$(OBJ) $(TEST_SUPPORT) $(OBJDIR)/tests/$(notdir $(basename $(TEST))).o
-	@echo "Built: $(OBJDIR)/tests/$(notdir $(basename $(TEST)))"
+	$(CC) $(CFLAGS) -c $(TEST) -o $(TESTDIR)/$(notdir $(basename $(TEST))).o
+	$(CC) $(CFLAGS) -o $(TESTDIR)/$(notdir $(basename $(TEST))) \
+		$(OBJ) $(TEST_SUPPORT) $(TESTDIR)/$(notdir $(basename $(TEST))).o
+	@echo "Built: $(TESTDIR)/$(notdir $(basename $(TEST)))"
 
 run_test: test
-	@$(OBJDIR)/tests/$(notdir $(basename $(TEST)))
+	@$(TESTDIR)/$(notdir $(basename $(TEST)))
