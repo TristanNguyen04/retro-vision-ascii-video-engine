@@ -15,11 +15,13 @@ COMMON_INC_DIR = include/common
 PARSER_INC_DIR = include/parsers
 JSON_INC_DIR = include/parsers/json
 COMPONENT_INC_DIR = include/components
+COMPRESSION_INC_DIR = include/compressions
+ALGORITHM_INC_DIR = include/compressions/algorithms
 
 COMMON_OBJ = $(OBJDIR)/io_utils.o
 PARSER_OBJ = $(OBJDIR)/wav.o $(OBJDIR)/bmp.o $(OBJDIR)/json.o $(OBJDIR)/config.o
 COMPONENT_OBJ = $(OBJDIR)/sequence.o $(OBJDIR)/ascii.o $(OBJDIR)/render.o $(OBJDIR)/engine.o
-COMPRESSION_OBJ = $(OBJDIR)/rle.o 
+COMPRESSION_OBJ = $(OBJDIR)/rle.o  $(OBJDIR)/delta.o
 
 OBJ = $(COMMON_OBJ) $(PARSER_OBJ) $(COMPONENT_OBJ) $(COMPRESSION_OBJ)
 TEST_SUPPORT = $(TESTDIR)/tests_helper.o
@@ -70,8 +72,11 @@ $(OBJDIR)/engine.o: $(COMPONENT_SRC_DIR)/engine.c \
 	$(JSON_INC_DIR)/config.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/engine.c -o $(OBJDIR)/engine.o
 
-$(OBJDIR)/rle.o: $(ALGORITHM_SRC_DIR)/rle.c
-	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/rle.c -o $(OBJDIR)/rle.o
+$(OBJDIR)/rle.o: $(ALGORITHM_SRC_DIR)/rle.c $(ALGORITHM_INC_DIR)/rle.h
+	$(CC) $(CFLAGS) -c -I$(ALGORITHM_INC_DIR) $(ALGORITHM_SRC_DIR)/rle.c -o $(OBJDIR)/rle.o
+
+$(OBJDIR)/delta.o: $(ALGORITHM_SRC_DIR)/delta.c $(ALGORITHM_INC_DIR)/delta.h
+	$(CC) $(CFLAGS) -c -I$(ALGORITHM_INC_DIR) $(ALGORITHM_SRC_DIR)/delta.c -o $(OBJDIR)/delta.o
 
 $(TESTDIR)/tests_helper.o: tests/tests_helper.c tests/tests_helper.h | $(TESTDIR)
 	$(CC) $(CFLAGS) -c tests/tests_helper.c -o $(TESTDIR)/tests_helper.o
