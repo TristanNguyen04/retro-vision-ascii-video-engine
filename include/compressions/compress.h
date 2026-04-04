@@ -4,7 +4,7 @@
 typedef enum {
     COMPRESS_NONE,
     COMPRESS_RLE,
-    COMPRESS_HUFFMAN
+    COMPRESS_DELTA
 } CompressionType;
 
 /**

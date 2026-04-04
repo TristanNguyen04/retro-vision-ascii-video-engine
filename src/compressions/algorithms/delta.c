@@ -25,7 +25,7 @@ char *delta_compress(const char *prev, const char *curr) {
     char *output;
     int out_idx;
     int i, same;
-    DeltaMachine fsm = {STATE_START, 0, 0};
+    DeltaCFSM fsm = {DELTA_CSTATE_START, 0, 0};
 
     if (!prev || !curr)
         return NULL;
@@ -47,48 +47,138 @@ char *delta_compress(const char *prev, const char *curr) {
         same = (prev[i] == curr[i]);
 
         switch (fsm.state) {
-        case STATE_START:
+        case DELTA_CSTATE_START:
             if (same) {
-                fsm.state = STATE_COPY;
-                fsm.count = 1;
+                fsm.state = DELTA_CSTATE_MATCH;
+                fsm.run_length = 1;
             } else {
-                fsm.state = STATE_CHANGE;
-                fsm.count = 1;
-                fsm.run_start = i;
+                fsm.state = DELTA_CSTATE_DIFF;
+                fsm.run_length = 1;
+                fsm.diff_start = i;
             }
             break;
-        case STATE_COPY:
+        case DELTA_CSTATE_MATCH:
             if (same) {
-                fsm.count++;
+                fsm.run_length++;
             } else {
-                emit_copy(output, &out_idx, fsm.count);
+                emit_copy(output, &out_idx, fsm.run_length);
 
-                fsm.state = STATE_CHANGE;
-                fsm.count = 1;
-                fsm.run_start = i;
+                fsm.state = DELTA_CSTATE_DIFF;
+                fsm.run_length = 1;
+                fsm.diff_start = i;
             }
             break;
-        case STATE_CHANGE:
+        case DELTA_CSTATE_DIFF:
             if (!same) {
-                fsm.count++;
+                fsm.run_length++;
             } else {
-                emit_change(output, &out_idx, curr, fsm.run_start, fsm.count);
+                emit_change(output, &out_idx, curr, fsm.diff_start, fsm.run_length);
 
-                fsm.state = STATE_COPY;
-                fsm.count = 1;
+                fsm.state = DELTA_CSTATE_MATCH;
+                fsm.run_length = 1;
             }
             break;
         }
     }
     switch (fsm.state) {
-    case STATE_COPY:
-        emit_copy(output, &out_idx, fsm.count);
+    case DELTA_CSTATE_MATCH:
+        emit_copy(output, &out_idx, fsm.run_length);
         break;
-    case STATE_CHANGE:
-        emit_change(output, &out_idx, curr, fsm.run_start, fsm.count);
+    case DELTA_CSTATE_DIFF:
+        emit_change(output, &out_idx, curr, fsm.diff_start, fsm.run_length);
         break;
     default:
         break;
+    }
+
+    output[out_idx] = '\0';
+    return output;
+}
+
+char *delta_uncompress(const char *prev, const char *encoded) {
+    int i;
+    int len;
+    int encoded_idx, out_idx, prev_idx; /* index in encoded, output, prev */
+    char *output;
+    char c;
+    DeltaDFSM fsm = {DELTA_DSTATE_START, 0};
+
+    if (!prev || !encoded)
+        return NULL;
+
+    len = strlen(prev);
+    output = malloc(len + 1);
+    if (!output)
+        return NULL;
+
+    encoded_idx = 0;
+    out_idx = 0;
+    prev_idx = 0;
+
+    while (encoded[encoded_idx]) {
+        c = encoded[encoded_idx];
+
+        switch (fsm.state) {
+        case DELTA_DSTATE_START:
+            if (c == '=') {
+                fsm.run_length = 0;
+                fsm.state = DELTA_DSTATE_READ_COPY_NUM;
+                encoded_idx++;
+            } else if (c == '+') {
+                fsm.run_length = 0;
+                fsm.state = DELTA_DSTATE_READ_INSERT_NUM;
+                encoded_idx++;
+            } else {
+                /* invalid format */
+                free(output);
+                return NULL;
+            }
+            break;
+
+        case DELTA_DSTATE_READ_COPY_NUM:
+            if ('0' <= c && c <= '9') {
+                fsm.run_length = fsm.run_length * 10 + (c - '0');
+                encoded_idx++;
+            } else {
+                fsm.state = DELTA_DSTATE_COPY;
+            }
+            break;
+
+        case DELTA_DSTATE_READ_INSERT_NUM:
+            if ('0' <= c && c <= '9') {
+                fsm.run_length = fsm.run_length * 10 + (c - '0');
+                encoded_idx++;
+            } else {
+                fsm.state = DELTA_DSTATE_INSERT;
+            }
+            break;
+
+        case DELTA_DSTATE_COPY:
+            for (i = 0; i < fsm.run_length; i++) {
+                output[out_idx++] = prev[prev_idx++];
+            }
+            fsm.state = DELTA_DSTATE_START;
+            break;
+
+        case DELTA_DSTATE_INSERT:
+            for (i = 0; i < fsm.run_length; i++) {
+                output[out_idx++] = encoded[encoded_idx++];
+                prev_idx++;
+            }
+            fsm.state = DELTA_DSTATE_START;
+            break;
+        }
+    }
+
+    /* Handle case where number ends exactly at end of string */
+    if (fsm.state == DELTA_DSTATE_COPY || fsm.state == DELTA_DSTATE_READ_COPY_NUM) {
+        for (i = 0; i < fsm.run_length; i++) {
+            output[out_idx++] = prev[prev_idx++];
+        }
+    } else if (fsm.state == DELTA_DSTATE_INSERT || fsm.state == DELTA_DSTATE_READ_INSERT_NUM) {
+        /* invalid: missing inserted chars */
+        free(output);
+        return NULL;
     }
 
     output[out_idx] = '\0';

@@ -78,18 +78,18 @@ static int test_ascii_frame_like() {
 }
 
 int main() {
-    test_report("delta all_same", test_all_same());
-    test_report("delta all_different", test_all_different());
-    test_report("delta single_change_end", test_single_change_end());
-    test_report("delta single_change_start", test_single_change_start());
-    test_report("delta middle_block_change", test_middle_block_change());
-    test_report("delta alternating_changes", test_alternating_changes());
-    test_report("delta small_scattered", test_small_scattered());
-    test_report("delta empty_strings", test_empty_strings());
-    test_report("delta length_mismatch", test_length_mismatch());
-    test_report("delta null_prev", test_null_prev());
-    test_report("delta null_curr", test_null_curr());
-    test_report("delta ascii_frame_like", test_ascii_frame_like());
+    test_report("delta compress all_same", test_all_same());
+    test_report("delta compress all_different", test_all_different());
+    test_report("delta compress single_change_end", test_single_change_end());
+    test_report("delta compress single_change_start", test_single_change_start());
+    test_report("delta compress middle_block_change", test_middle_block_change());
+    test_report("delta compress alternating_changes", test_alternating_changes());
+    test_report("delta compress small_scattered", test_small_scattered());
+    test_report("delta compress empty_strings", test_empty_strings());
+    test_report("delta compress length_mismatch", test_length_mismatch());
+    test_report("delta compress null_prev", test_null_prev());
+    test_report("delta compress null_curr", test_null_curr());
+    test_report("delta compress ascii_frame_like", test_ascii_frame_like());
 
     test_summary();
 
