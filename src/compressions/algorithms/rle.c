@@ -33,12 +33,14 @@ char *rle_compress(const char *input) {
     if (!input)
         return NULL;
 
-    if (contains_digit(input)) {
+    if (contains_digit(input))
         return NULL;
-    }
 
     len = strlen(input);
     output = malloc(len * 2 + 1); /* worse case is len*2+1 */
+
+    if (!output)
+        return NULL;
 
     for (i = 0; i < len; i++) {
         c = input[i];
