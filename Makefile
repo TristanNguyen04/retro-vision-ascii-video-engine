@@ -4,6 +4,9 @@ CFLAGS = -Wall -Werror -ansi -pedantic -Iinclude
 OBJDIR = build
 TESTDIR = $(OBJDIR)/tests
 
+TARGET = retrovision
+MAIN_OBJ = $(OBJDIR)/demo_engine.o
+
 COMMON_SRC_DIR = src/common
 PARSER_SRC_DIR = src/parsers
 JSON_SRC_DIR = src/parsers/json
@@ -23,7 +26,10 @@ TEST_SUPPORT = $(TESTDIR)/tests_helper.o
 
 .PHONY: all clean re test run_test
 
-all: $(OBJ)
+all: $(TARGET)
+
+$(TARGET): $(OBJ) $(MAIN_OBJ)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) $(MAIN_OBJ)
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
@@ -65,11 +71,14 @@ $(OBJDIR)/engine.o: $(COMPONENT_SRC_DIR)/engine.c \
 	$(JSON_INC_DIR)/config.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/engine.c -o $(OBJDIR)/engine.o
 
+$(OBJDIR)/demo_engine.o: output/demo/demo_engine/demo_engine.c $(COMPONENT_INC_DIR)/engine.h | $(OBJDIR)
+	$(CC) $(CFLAGS) -c output/demo/demo_engine/demo_engine.c -o $(OBJDIR)/demo_engine.o
+
 $(TESTDIR)/tests_helper.o: tests/tests_helper.c tests/tests_helper.h | $(TESTDIR)
 	$(CC) $(CFLAGS) -c tests/tests_helper.c -o $(TESTDIR)/tests_helper.o
 
 clean:
-	rm -rf $(OBJDIR)
+	rm -rf $(OBJDIR) $(TARGET)
 
 re: clean all
 
@@ -77,7 +86,7 @@ re: clean all
 # make test TEST=tests/common/test_io_utils.c
 # make test TEST=tests/parsers/test_json.c
 # make run_test TEST=tests/components/test_sequence.c
-test: all $(TEST_SUPPORT)
+test: $(OBJ) $(TEST_SUPPORT)
 	@if [ -z "$(TEST)" ]; then \
 		echo "Usage: make test TEST=tests/common/test_io_utils.c"; \
 		exit 1; \
