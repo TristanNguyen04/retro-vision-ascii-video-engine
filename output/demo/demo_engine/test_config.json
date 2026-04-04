@@ -1,0 +1,11 @@
+{
+  "frames_dir": "frames",
+  "frame_prefix": "0",
+  "frame_digits": 4,
+  "frame_extension": ".bmp",
+  "fps": 30,
+  "start_frame": 100,
+  "end_frame": 700,
+  "palette": "@#*+=-:.",
+  "threshold": 5000
+}
