@@ -8,7 +8,9 @@
 
 static int run_test(const char *input, const char *expected) {
     char *result = rle_compress(input);
-    return strcmp(result, expected) == 0;
+    int ok = (strcmp(result, expected) == 0);
+    free(result);
+    return ok;
 }
 
 static int test_basic() {
@@ -44,8 +46,8 @@ static int test_symbols() {
 }
 
 int main() {
-    test_report("rle one_char", test_one_char());
     test_report("rle basic", test_basic());
+    test_report("rle one_char", test_one_char());
     test_report("rle no_repetition", test_no_repetition());
     test_report("rle all_same", test_all_same());
     test_report("rle empty_string", test_empty_string());
