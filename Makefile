@@ -8,6 +8,8 @@ COMMON_SRC_DIR = src/common
 PARSER_SRC_DIR = src/parsers
 JSON_SRC_DIR = src/parsers/json
 COMPONENT_SRC_DIR = src/components
+COMPRESSION_SRC_DIR = src/compressions
+ALGORITHM_SRC_DIR = src/compressions/algorithms
 
 COMMON_INC_DIR = include/common
 PARSER_INC_DIR = include/parsers
@@ -17,8 +19,9 @@ COMPONENT_INC_DIR = include/components
 COMMON_OBJ = $(OBJDIR)/io_utils.o
 PARSER_OBJ = $(OBJDIR)/wav.o $(OBJDIR)/bmp.o $(OBJDIR)/json.o $(OBJDIR)/config.o
 COMPONENT_OBJ = $(OBJDIR)/sequence.o $(OBJDIR)/ascii.o $(OBJDIR)/render.o $(OBJDIR)/engine.o
+COMPRESSION_OBJ = $(OBJDIR)/rle.o 
 
-OBJ = $(COMMON_OBJ) $(PARSER_OBJ) $(COMPONENT_OBJ)
+OBJ = $(COMMON_OBJ) $(PARSER_OBJ) $(COMPONENT_OBJ) $(COMPRESSION_OBJ)
 TEST_SUPPORT = $(TESTDIR)/tests_helper.o
 
 .PHONY: all clean re test run_test
@@ -26,10 +29,12 @@ TEST_SUPPORT = $(TESTDIR)/tests_helper.o
 all: $(OBJ)
 
 $(OBJDIR):
-	mkdir -p $(OBJDIR)
+	mkdir $(OBJDIR) 2>nul || true
+# 	mkdir -p $(OBJDIR)
 
 $(TESTDIR):
-	mkdir -p $(TESTDIR)
+	mkdir $(TESTDIR) 2>nul || true
+# 	mkdir -p $(TESTDIR)
 
 $(OBJDIR)/io_utils.o: $(COMMON_SRC_DIR)/io_utils.c $(COMMON_INC_DIR)/io_utils.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $(COMMON_SRC_DIR)/io_utils.c -o $(OBJDIR)/io_utils.o
@@ -65,6 +70,9 @@ $(OBJDIR)/engine.o: $(COMPONENT_SRC_DIR)/engine.c \
 	$(JSON_INC_DIR)/config.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/engine.c -o $(OBJDIR)/engine.o
 
+$(OBJDIR)/rle.o: $(ALGORITHM_SRC_DIR)/rle.c
+	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/rle.c -o $(OBJDIR)/rle.o
+
 $(TESTDIR)/tests_helper.o: tests/tests_helper.c tests/tests_helper.h | $(TESTDIR)
 	$(CC) $(CFLAGS) -c tests/tests_helper.c -o $(TESTDIR)/tests_helper.o
 
@@ -78,10 +86,10 @@ re: clean all
 # make test TEST=tests/parsers/test_json.c
 # make run_test TEST=tests/components/test_sequence.c
 test: all $(TEST_SUPPORT)
-	@if [ -z "$(TEST)" ]; then \
-		echo "Usage: make test TEST=tests/common/test_io_utils.c"; \
-		exit 1; \
-	fi
+# 	@if [ -z "$(TEST)" ]; then \
+# 		echo "Usage: make test TEST=tests/common/test_io_utils.c"; \
+# 		exit 1; \
+# 	fi
 	$(CC) $(CFLAGS) -c $(TEST) -o $(TESTDIR)/$(notdir $(basename $(TEST))).o
 	$(CC) $(CFLAGS) -o $(TESTDIR)/$(notdir $(basename $(TEST))) \
 		$(OBJ) $(TEST_SUPPORT) $(TESTDIR)/$(notdir $(basename $(TEST))).o
