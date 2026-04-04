@@ -8,7 +8,16 @@
 
 static int run_test(const char *input, const char *expected) {
     char *result = rle_compress(input);
-    int ok = (strcmp(result, expected) == 0);
+    int ok = 0;
+
+    if (result == NULL && expected == NULL) {
+        ok = 1;
+    } else if (result == NULL || expected == NULL) {
+        ok = 0;
+    } else {
+        ok = (strcmp(result, expected) == 0);
+    }
+
     free(result);
     return ok;
 }
@@ -45,6 +54,14 @@ static int test_symbols() {
     return run_test("!!!@@", "!3@2");
 }
 
+static int test_digits() {
+    return run_test("123", NULL);
+}
+
+static int test_contains_digit() {
+    return run_test("A123B", NULL);
+}
+
 int main() {
     test_report("rle basic", test_basic());
     test_report("rle one_char", test_one_char());
@@ -54,6 +71,8 @@ int main() {
     test_report("rle mixed", test_mixed());
     test_report("rle spaces", test_with_spaces());
     test_report("rle symbols", test_symbols());
+    test_report("rle digits", test_digits());
+    test_report("rle contains_digit", test_contains_digit());
 
     test_summary();
 

@@ -20,8 +20,10 @@ typedef struct {
  *
  *   "AAAABBBCCDAA" -> "A4B3C2D1A2"
  *
- * @return A newly allocated null-terminated string containing the RLE-compressed result.
- *         The caller is responsible for freeing the returned string using free().
+ * @return A newly allocated null-terminated string containing the RLE-compressed result,
+ *         or NULL if an error occurs (e.g., input is NULL, contains invalid characters).
+ *
+ * @note The input string should not contain any numeric digit.
  *
  */
 char *rle_compress(const char *input);
