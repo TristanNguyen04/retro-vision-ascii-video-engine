@@ -23,8 +23,9 @@ typedef struct {
  * @return A newly allocated null-terminated string containing the RLE-compressed result,
  *         or NULL if an error occurs (e.g., input is NULL, contains invalid characters).
  *
- * @note The input string should not contain any numeric digit.
- *
+ * @note
+ * - The input string should not contain any numeric digit.
+ * - Caller must free the returned string.
  */
 char *rle_compress(const char *input);
 
