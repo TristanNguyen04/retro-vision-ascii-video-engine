@@ -79,17 +79,17 @@ static int test_round_trip() {
 }
 
 int main() {
-    test_report("delta decompress basic_copy", test_basic_copy_only());
-    test_report("delta decompress basic_insert_only", test_basic_insert_only());
-    test_report("delta decompress mixed", test_mixed());
-    test_report("delta decompress empty_string", test_empty_string());
-    test_report("delta decompress single_char_change", test_single_char_change());
-    test_report("delta decompress single_char_copy", test_single_char_copy());
-    test_report("delta decompress multi_digit_counts", test_multi_digit_counts());
-    test_report("delta decompress invalid_format", test_invalid_format());
-    test_report("delta decompress null_prev", test_null_prev());
-    test_report("delta decompress null_encoded", test_null_encoded());
-    test_report("delta decompress round_trip", test_round_trip());
+    test_report("delta uncompress basic_copy", test_basic_copy_only());
+    test_report("delta uncompress basic_insert_only", test_basic_insert_only());
+    test_report("delta uncompress mixed", test_mixed());
+    test_report("delta uncompress empty_string", test_empty_string());
+    test_report("delta uncompress single_char_change", test_single_char_change());
+    test_report("delta uncompress single_char_copy", test_single_char_copy());
+    test_report("delta uncompress multi_digit_counts", test_multi_digit_counts());
+    test_report("delta uncompress invalid_format", test_invalid_format());
+    test_report("delta uncompress null_prev", test_null_prev());
+    test_report("delta uncompress null_encoded", test_null_encoded());
+    test_report("delta uncompress round_trip", test_round_trip());
 
     test_summary();
 
