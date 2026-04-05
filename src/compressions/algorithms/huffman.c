@@ -39,7 +39,75 @@ HuffmanNode *huffman_build(char data[], int freq[], int size) {
     node = (HuffmanNode *)minheap_extract_min(heap).data; /* root node */
     minheap_free(heap);
 
-    return node->data;
+    return node;
 }
 
-/* TODO */
+static int find_code(HuffmanNode *root, char target, char *buffer, int depth) {
+    if (!root) return; 
+
+    if (is_leaf(root) && root->data == target) {
+        buffer[depth] = '\0';
+        return 1;
+    }
+
+    buffer[depth] = '0';
+    if (find_code(root->left, target, buffer, depth+1)) {
+        return 1;
+    }
+
+    buffer[depth] = '1';
+    if (find_code(root->right, target, buffer, depth+1)) {
+        return 1;
+    }
+
+    return 0;
+}
+
+char *huffman_encode(HuffmanNode *root, const char *text) {
+    int capacity = 128;
+    int length = 0;
+    char *encoded, *tmp;
+    char buffer[100];
+    int buf_len;
+    int i;
+
+    encoded = malloc(capacity);
+    if (!encoded)
+        return NULL;
+
+    encoded[0] = '\0';
+
+    for (i = 0; text[i] != '\0'; i++) {
+        find_code(root, text[i], buffer, 0);
+
+        buf_len = strlen(buffer);
+
+        if (buf_len + length + 1 > capacity) {
+            while (buf_len + length + 1 > capacity) 
+                capacity *= 2;
+            tmp = realloc(encoded, capacity);
+            if (!tmp) {
+                free(encoded);
+                return NULL;
+            }
+            encoded = tmp;
+        }
+
+        memcpy(encoded + length, buffer, buf_len);
+        length += buf_len;
+        encoded[length] = '\0';
+    }
+
+    return encoded;
+}
+
+/* TODO: huffman_deocde with FSM */
+
+void huffman_free_tree(HuffmanNode *root) {
+    if (!root) 
+        return;
+
+    huffman_free_tree(root->left);
+    huffman_free_tree(root->right);
+    free(root);
+}
