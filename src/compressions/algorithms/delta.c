@@ -1,4 +1,4 @@
-#include "delta.h"
+#include "compressions/algorithms/delta.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
