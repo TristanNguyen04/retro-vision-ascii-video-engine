@@ -6,7 +6,7 @@
 #include "../../tests_helper.h"
 #include "compressions/algorithms/huffman.h"
 
-static int run_test(const char *input) {
+static int run_test(const char *input, int K) {
     char data[] = {'A', 'B', 'C', 'D', 'E', 'F'};
     int freq[] = {5, 9, 12, 13, 16, 45};
     int size = 6;
@@ -16,16 +16,16 @@ static int run_test(const char *input) {
     int ok;
 
     root = huffman_build(data, freq, size);
-    huffman_generate_codes(root);
-    fsm = huffman_build_fsm(root, 4);
+    /* huffman_generate_codes(root); */
+    fsm = huffman_build_fsm(root, K);
     if (!fsm) {
         huffman_free_fsm(fsm);
         huffman_free_tree(root);
         return 0;
     }
 
-    encoded = huffman_encode(root, input);
-    decoded = huffman_decode(fsm, encoded);
+    encoded = huffman_encode(root, input, K);
+    decoded = huffman_decode(fsm, encoded, strlen(input));
     ok = (decoded && strcmp(decoded, input) == 0);
 
     if (!ok) {
@@ -41,27 +41,31 @@ static int run_test(const char *input) {
 }
 
 static int test_basic() {
-    return run_test("ABCDEF");
+    return run_test("ABCDEF", 4);
 }
 
 static int test_repeated() {
-    return run_test("AAAAAA");
+    return run_test("AAAAAA", 4);
 }
 
 static int test_mixed() {
-    return run_test("ABACABADABACABA");
+    return run_test("ABACABADABACABA", 4);
 }
 
 static int test_single_char() {
-    return run_test("A");
+    return run_test("A", 4);
 }
 
 static int test_empty() {
-    return run_test("");
+    return run_test("", 4);
 }
 
 static int test_long() {
-    return run_test("ABCDEFABCDEFABCDEFABCDEFABCDEF");
+    return run_test("ABCDEFABCDEFABCDEFABCDEFABCDEF", 4);
+}
+
+static int test_diff_k() {
+    return run_test("ABCDEFABCDEFABCDEFABCDEFABCDEF", 1) && run_test("ABCDEFABCDEFABCDEFABCDEFABCDEF", 4) && run_test("ABCDEFABCDEFABCDEFABCDEFABCDEF", 5);
 }
 
 int main() {
@@ -71,6 +75,7 @@ int main() {
     test_report("huffman single", test_single_char());
     test_report("huffman empty", test_empty());
     test_report("huffman long", test_long());
+    test_report("huffman different k", test_diff_k());
 
     test_summary();
     return test_failed_count() == 0 ? 0 : 1;

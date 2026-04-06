@@ -1,6 +1,8 @@
 #ifndef HUFFMAN_H
 #define HUFFMAN_H
 
+#define MAX_SYMBOLS 16
+
 typedef struct HuffmanNode {
     char data;
     int freq;
@@ -8,8 +10,8 @@ typedef struct HuffmanNode {
 } HuffmanNode;
 
 typedef struct {
-    char symbol;
-    int has_symbol;
+    char symbols[MAX_SYMBOLS];
+    int symbol_count;
     int bits_used;
     int next_state;
 } FSMEntry;
@@ -24,11 +26,11 @@ HuffmanNode *huffman_build(char data[], int freq[], int size);
 
 void huffman_generate_codes(HuffmanNode *root);
 
-char *huffman_encode(HuffmanNode *root, const char *text);
+char *huffman_encode(HuffmanNode *root, const char *text, int K);
 
 HuffmanFSM *huffman_build_fsm(HuffmanNode *root, int K);
 
-char *huffman_decode(HuffmanFSM *fsm, const char *encoded);
+char *huffman_decode(HuffmanFSM *fsm, const char *encoded, int original_len);
 
 void huffman_free_tree(HuffmanNode *root);
 

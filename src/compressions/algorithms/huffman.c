@@ -86,13 +86,14 @@ static int find_code(HuffmanNode *root, char target, char *buffer, int depth) {
     return 0;
 }
 
-char *huffman_encode(HuffmanNode *root, const char *text) {
+char *huffman_encode(HuffmanNode *root, const char *text, int K) {
     int capacity = 128;
     int length = 0;
     char *encoded, *tmp;
     char buffer[100];
     int buf_len;
     int i;
+    int remainder, pad;
 
     encoded = malloc(capacity);
     if (!encoded)
@@ -121,6 +122,29 @@ char *huffman_encode(HuffmanNode *root, const char *text) {
         encoded[length] = '\0';
     }
 
+    /* Pad it such that the length is always multiplier of K */
+    remainder = length % K;
+    if (remainder != 0) {
+        pad = K - remainder;
+
+        if (length + pad + 1 > capacity) {
+            while (length + pad + 1 > capacity)
+                capacity *= 2;
+
+            tmp = realloc(encoded, capacity);
+            if (!tmp) {
+                free(encoded);
+                return NULL;
+            }
+            encoded = tmp;
+        }
+    }
+
+    for (i = 0; i < pad; i++) {
+        encoded[length++] = '0';
+    }
+
+    encoded[length] = '\0';
     return encoded;
 }
 
@@ -145,9 +169,8 @@ HuffmanFSM *huffman_build_fsm(HuffmanNode *root, int K) {
     int num_states = count_nodes(root);
     int table_width = 1 << K;
     HuffmanNode **nodes;
-    int idx, bits_used, has_symbol, bit, next_state;
+    int idx, bits_used, bit, next_state;
     int s, i, b, t; /* iteration vars */
-    char symbol;
     HuffmanNode *curr;
     FSMEntry *entry;
     HuffmanFSM *fsm;
@@ -177,8 +200,8 @@ HuffmanFSM *huffman_build_fsm(HuffmanNode *root, int K) {
         for (i = 0; i < table_width; i++) {
             curr = nodes[s];
             bits_used = 0;
-            symbol = 0;
-            has_symbol = 0;
+            entry = &fsm->table[s * table_width + i];
+            entry->symbol_count = 0;
 
             for (b = 0; b < K; b++) {
                 bit = (i >> (K - 1 - b)) & 1;
@@ -189,7 +212,6 @@ HuffmanFSM *huffman_build_fsm(HuffmanNode *root, int K) {
                     curr = curr->right;
 
                 if (!curr) {
-                    has_symbol = 0;
                     bits_used = b + 1;
                     curr = root;
                     break;
@@ -198,14 +220,15 @@ HuffmanFSM *huffman_build_fsm(HuffmanNode *root, int K) {
                 bits_used++;
 
                 if (is_leaf(curr)) {
-                    symbol = curr->data;
-                    has_symbol = 1;
+                    if (entry->symbol_count < MAX_SYMBOLS) {
+                        entry->symbols[entry->symbol_count++] = curr->data;
+                    }
                     curr = root; /* reset after emitting */
-                    break;
                 }
             }
 
             next_state = 0;
+            /* TODO: optimize */
             for (t = 0; t < num_states; t++) {
                 if (nodes[t] == curr) {
                     next_state = t;
@@ -213,9 +236,6 @@ HuffmanFSM *huffman_build_fsm(HuffmanNode *root, int K) {
                 }
             }
 
-            entry = &fsm->table[s * table_width + i];
-            entry->symbol = symbol;
-            entry->has_symbol = has_symbol;
             entry->bits_used = bits_used;
             entry->next_state = next_state;
         }
@@ -236,10 +256,11 @@ static int read_k_bits(const char *encoded, int pos, int K) {
 }
 
 /* huffman_deocde with FSM */
-char *huffman_decode(HuffmanFSM *fsm, const char *encoded) {
+char *huffman_decode(HuffmanFSM *fsm, const char *encoded, int original_len) {
     int capacity = 128;
     int length = 0;
-    int pos, encoded_len, state, K, table_width, bits;
+    int pos, state, K, table_width, bits;
+    int k;
     FSMEntry fsm_entry;
 
     char *output = malloc(capacity);
@@ -247,40 +268,25 @@ char *huffman_decode(HuffmanFSM *fsm, const char *encoded) {
         return NULL;
 
     pos = 0; /* current pos in encoded bit string */
-    encoded_len = strlen(encoded);
 
     state = 0; /* root */
     K = fsm->K;
     table_width = 1 << K;
 
-    while (pos < encoded_len) {
-        if (pos + K > encoded_len) {
-            /* read 1 bit by 1 bit instead of K bits because the remaining length < K */
-            bits = (encoded[pos] == '1') ? 1 : 0;
-
-            fsm_entry = fsm->table[state * table_width + (bits << (K - 1))];
-
-            if (fsm_entry.has_symbol) {
-                if (length + 1 >= capacity) {
-                    capacity *= 2;
-                    output = realloc(output, capacity);
-                }
-                output[length++] = fsm_entry.symbol;
-            }
-
-            state = fsm_entry.next_state;
-            pos += fsm_entry.bits_used;
-            continue;
-        }
-
+    while (length < original_len) {
         bits = read_k_bits(encoded, pos, K);
         fsm_entry = fsm->table[state * table_width + bits];
-        if (fsm_entry.has_symbol) {
+
+        for (k = 0; k < fsm_entry.symbol_count; k++) {
             if (length + 1 >= capacity) {
                 capacity *= 2;
                 output = realloc(output, capacity);
             }
-            output[length++] = fsm_entry.symbol;
+
+            output[length++] = fsm_entry.symbols[k];
+
+            if (length == original_len)
+                break;
         }
 
         state = fsm_entry.next_state;
