@@ -1,4 +1,6 @@
-#include "minheap.h"
+#include "common/minheap.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 static void swap(HeapNode *a, HeapNode *b) {
     HeapNode tmp = *a;
@@ -46,7 +48,7 @@ MinHeap *minheap_create(int capacity) {
         return NULL;
 
     heap->size = 0;
-    heap->capacity = 0;
+    heap->capacity = capacity;
     heap->array = (HeapNode *)malloc(capacity * sizeof(HeapNode));
 
     if (!heap->array) {
@@ -69,7 +71,11 @@ void minheap_insert(MinHeap *heap, void *data, int priority) {
     int idx;
     if (heap->size == heap->capacity) {
         /* resize */
-        heap->capacity *= 2;
+        if (heap->capacity == 0)
+            heap->capacity = 1;
+        else
+            heap->capacity *= 2;
+
         heap->array = realloc(heap->array, heap->capacity * sizeof(HeapNode));
     }
 
@@ -78,7 +84,7 @@ void minheap_insert(MinHeap *heap, void *data, int priority) {
     heap->array[idx].data = data;
     heap->array[idx].priority = priority;
 
-    heapify_up(heap, idx);
+    bubble_up(heap, idx);
 }
 
 HeapNode minheap_extract_min(MinHeap *heap) {
@@ -94,7 +100,7 @@ HeapNode minheap_extract_min(MinHeap *heap) {
     heap->array[0] = heap->array[heap->size - 1];
     heap->size--;
 
-    heapify_down(heap, 0);
+    bubble_down(heap, 0);
 
     return root;
 }
@@ -111,5 +117,5 @@ HeapNode minheap_peek(MinHeap *heap) {
 int minheap_is_empty(MinHeap *heap) {
     if (!heap)
         return 1;
-    return heap->size == heap->capacity;
+    return heap->size == 0;
 }
