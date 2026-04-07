@@ -15,7 +15,7 @@ static int run_test(const char *input, int K) {
     char *encoded, *decoded;
     int ok;
 
-    root = huffman_build(data, freq, size);
+    root = huffman_build_tree(data, freq, size);
     /* huffman_generate_codes(root); */
     fsm = huffman_build_fsm(root, K);
     if (!fsm) {

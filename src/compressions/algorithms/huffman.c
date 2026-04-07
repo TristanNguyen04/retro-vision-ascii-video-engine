@@ -16,7 +16,7 @@ static int is_leaf(HuffmanNode *node) {
     return !node->left && !node->right;
 }
 
-HuffmanNode *huffman_build(char data[], int freq[], int size) {
+HuffmanNode *huffman_build_tree(char data[], int freq[], int size) {
     int i;
     HuffmanNode *node, *left, *right, *merged;
     MinHeap *heap = minheap_create(size);

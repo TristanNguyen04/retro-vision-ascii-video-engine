@@ -22,7 +22,7 @@ typedef struct {
     int K;
 } HuffmanFSM;
 
-HuffmanNode *huffman_build(char data[], int freq[], int size);
+HuffmanNode *huffman_build_tree(char data[], int freq[], int size);
 
 void huffman_generate_codes(HuffmanNode *root);
 
