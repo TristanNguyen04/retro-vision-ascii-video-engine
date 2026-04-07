@@ -37,12 +37,10 @@ $(TARGET): $(OBJ) $(MAIN_OBJ)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) $(MAIN_OBJ)
 
 $(OBJDIR):
-	mkdir $(OBJDIR)
-# 	mkdir -p $(OBJDIR)
+	mkdir -p $(OBJDIR)
 
 $(TESTDIR):
-	mkdir $(TESTDIR)
-# 	mkdir -p $(TESTDIR)
+	mkdir -p $(TESTDIR)
 
 $(OBJDIR)/io_utils.o: $(COMMON_SRC_DIR)/io_utils.c $(COMMON_INC_DIR)/io_utils.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $(COMMON_SRC_DIR)/io_utils.c -o $(OBJDIR)/io_utils.o
@@ -106,10 +104,10 @@ re: clean all
 # make test TEST=tests/parsers/test_json.c
 # make run_test TEST=tests/components/test_sequence.c
 test: all $(TEST_SUPPORT)
-# 	@if [ -z "$(TEST)" ]; then \
-# 		echo "Usage: make test TEST=tests/common/test_io_utils.c"; \
-# 		exit 1; \
-# 	fi
+	@if [ -z "$(TEST)" ]; then \
+		echo "Usage: make test TEST=tests/common/test_io_utils.c"; \
+		exit 1; \
+	fi
 	$(CC) $(CFLAGS) -c $(TEST) -o $(TESTDIR)/$(notdir $(basename $(TEST))).o
 	$(CC) $(CFLAGS) -o $(TESTDIR)/$(notdir $(basename $(TEST))) \
 		$(OBJ) $(TEST_SUPPORT) $(TESTDIR)/$(notdir $(basename $(TEST))).o
