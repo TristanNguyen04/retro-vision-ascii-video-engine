@@ -7,7 +7,7 @@
 #include "compressions/algorithms/rle.h"
 
 static int run_test(const char *encoded, const char *expected) {
-    char *result = rle_uncompress(encoded);
+    char *result = rle_decompress(encoded);
     int ok = 0;
 
     if (result == NULL && expected == NULL) {

@@ -95,7 +95,7 @@ char *delta_compress(const char *prev, const char *curr) {
     return output;
 }
 
-char *delta_uncompress(const char *prev, const char *encoded) {
+char *delta_decompress(const char *prev, const char *encoded) {
     int i;
     int len;
     int encoded_idx, out_idx, prev_idx; /* index in encoded, output, prev */

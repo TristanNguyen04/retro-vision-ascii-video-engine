@@ -7,7 +7,7 @@
 #include "compressions/algorithms/delta.h"
 
 static int run_test(const char *prev, const char *encoded, const char *expected) {
-    char *result = delta_uncompress(prev, encoded);
+    char *result = delta_decompress(prev, encoded);
     int ok = 0;
 
     if (result == NULL && expected == NULL) {

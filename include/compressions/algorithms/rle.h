@@ -61,6 +61,6 @@ char *rle_compress(const char *input);
  * - Invalid formats (e.g., missing count, malformed numbers) will result in NULL.
  * - Caller must free the returned string.
  */
-char *rle_uncompress(const char *encoded);
+char *rle_decompress(const char *encoded);
 
 #endif

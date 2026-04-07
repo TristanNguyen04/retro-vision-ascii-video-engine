@@ -61,6 +61,6 @@ char *delta_compress(const char *prev, const char *curr);
  * - The encoded string must follow the valid delta format.
  * - Caller must free the returned string.
  */
-char *delta_uncompress(const char *prev, const char *encoded);
+char *delta_decompress(const char *prev, const char *encoded);
 
 #endif
