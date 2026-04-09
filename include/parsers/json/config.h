@@ -27,6 +27,10 @@ typedef struct {
 
     char palette[128];
     unsigned int threshold;
+
+    char compress_algorithm[64];
+    unsigned int huffman_K;
+
 } EngineConfig;
 
 /**
@@ -37,16 +41,16 @@ void config_init(EngineConfig *config);
 
 /**
  * Load Retro-Vision engine config from JSON file.
- * 
+ *
  * Behaviour:
  *      - parses JSON through the generic JSON layer
  *      - applies project defaults for attributes here
  *      - validates required keys, allowed keys, types, and value ranges
- * 
+ *
  *  On success:
  *      - returns CONFIG_OK
  *      - fills 'config'
- *  
+ *
  *  On failure:
  *      - returns nonzero error code
  *      - leaves 'config' in a safe state
