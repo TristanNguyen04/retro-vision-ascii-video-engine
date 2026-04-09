@@ -16,15 +16,31 @@ static int is_leaf(HuffmanNode *node) {
     return !node->left && !node->right;
 }
 
-HuffmanNode *huffman_build_tree(char data[], int freq[], int size) {
+HuffmanNode *huffman_build_tree(unsigned char data[], unsigned int freq[], int size) {
     int i;
     HuffmanNode *node, *left, *right, *merged;
     MinHeap *heap = minheap_create(size);
 
+    HuffmanNode *only, *dummy, *root;
+
     for (i = 0; i < size; i++) {
+        if (freq[i] <= 0)
+            continue;
         node = create_node(data[i], freq[i]);
         minheap_insert(heap, node, freq[i]);
     }
+
+    if (heap->size == 1) {
+        /* handle create valid tree where is only one char */
+        only = (HuffmanNode *)(minheap_extract_min(heap).data);
+        dummy = create_node('\0', 0);
+        root = create_node('$', only->freq);
+        root->left = only;
+        root->right = dummy;
+
+        return root;
+    }
+
     while (heap->size > 1) {
         left = (HuffmanNode *)(minheap_extract_min(heap).data);
         right = (HuffmanNode *)(minheap_extract_min(heap).data);
@@ -35,33 +51,46 @@ HuffmanNode *huffman_build_tree(char data[], int freq[], int size) {
         minheap_insert(heap, merged, merged->freq);
     }
 
+    if (heap->size == 0)
+        return NULL;
+
     node = (HuffmanNode *)(minheap_extract_min(heap).data); /* root node */
     minheap_free(heap);
 
     return node;
 }
 
-static void generate_codes_rec(HuffmanNode *node, char *buffer, int depth) {
+static void generate_codes_rec(HuffmanNode *node, unsigned int bits, int depth, HuffmanCode table[256]) {
+    unsigned char c;
+
     if (!node)
         return;
 
     if (!node->left && !node->right) {
-        buffer[depth] = '\0';
-        printf("%c: %s\n", node->data, buffer);
+        c = (unsigned char)node->data;
+
+        table[c].bits = bits;
+        table[c].length = depth;
         return;
     }
 
-    buffer[depth] = '0';
-    generate_codes_rec(node->left, buffer, depth + 1);
+    generate_codes_rec(node->left, bits << 1, depth + 1, table);
 
-    buffer[depth] = '1';
-    generate_codes_rec(node->right, buffer, depth + 1);
+    generate_codes_rec(node->right, (bits << 1) | 1, depth + 1, table);
 }
 
-/* for debug and printing out the codes of each char */
-void huffman_generate_codes(HuffmanNode *root) {
-    char buffer[256];
-    generate_codes_rec(root, buffer, 0);
+void huffman_generate_codes(
+    HuffmanNode *root,
+    HuffmanCode table[256]) {
+    int i;
+
+    /* initialize table */
+    for (i = 0; i < 256; i++) {
+        table[i].bits = 0;
+        table[i].length = 0;
+    }
+
+    generate_codes_rec(root, 0, 0, table);
 }
 
 static int find_code(HuffmanNode *root, char target, char *buffer, int depth) {
@@ -138,10 +167,9 @@ char *huffman_encode(HuffmanNode *root, const char *text, int K) {
             }
             encoded = tmp;
         }
-    }
-
-    for (i = 0; i < pad; i++) {
-        encoded[length++] = '0';
+        for (i = 0; i < pad; i++) {
+            encoded[length++] = '0';
+        }
     }
 
     encoded[length] = '\0';
@@ -175,7 +203,7 @@ HuffmanFSM *huffman_build_fsm(HuffmanNode *root, int K) {
     FSMEntry *entry;
     HuffmanFSM *fsm;
 
-    if (K <= 0)
+    if (K <= 0 || !root)
         return NULL;
 
     fsm = malloc(sizeof(HuffmanFSM));
