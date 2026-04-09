@@ -89,4 +89,6 @@ AsciiError ascii_render_image_with_highlight(
  */
 const char * ascii_error_string(AsciiError err);
 
+char * flatten_ascii_frame(const AsciiFrame * frame);
+
 #endif

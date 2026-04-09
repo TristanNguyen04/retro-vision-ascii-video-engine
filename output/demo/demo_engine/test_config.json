@@ -1,5 +1,5 @@
 {
-  "frames_dir": "frames",
+  "frames_dir": "./frames",
   "frame_prefix": "0",
   "frame_digits": 4,
   "frame_extension": ".bmp",
@@ -7,5 +7,7 @@
   "start_frame": 100,
   "end_frame": 700,
   "palette": "@#*+=-:.",
-  "threshold": 5000
+  "threshold": 5000,
+  "compression_algorithm": "huffman",
+  "huffman_K": 1
 }
