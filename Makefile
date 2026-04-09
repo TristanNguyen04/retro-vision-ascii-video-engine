@@ -23,8 +23,8 @@ ALGORITHM_INC_DIR = include/compressions/algorithms
 
 COMMON_OBJ = $(OBJDIR)/io_utils.o $(OBJDIR)/minheap.o
 PARSER_OBJ = $(OBJDIR)/wav.o $(OBJDIR)/bmp.o $(OBJDIR)/json.o $(OBJDIR)/config.o
-COMPONENT_OBJ = $(OBJDIR)/sequence.o $(OBJDIR)/ascii.o $(OBJDIR)/render.o $(OBJDIR)/engine.o
-COMPRESSION_OBJ = $(OBJDIR)/rle.o  $(OBJDIR)/delta.o $(OBJDIR)/huffman.o
+COMPONENT_OBJ = $(OBJDIR)/sequence.o $(OBJDIR)/ascii.o $(OBJDIR)/render.o $(OBJDIR)/render_compress.o $(OBJDIR)/engine.o # $(OBJDIR)/reader.o
+COMPRESSION_OBJ = $(OBJDIR)/bitstream.o $(OBJDIR)/compress.o $(OBJDIR)/decompress.o  $(OBJDIR)/rle.o  $(OBJDIR)/delta.o $(OBJDIR)/huffman.o 
 
 OBJ = $(COMMON_OBJ) $(PARSER_OBJ) $(COMPONENT_OBJ) $(COMPRESSION_OBJ)
 TEST_SUPPORT = $(TESTDIR)/tests_helper.o
@@ -69,6 +69,30 @@ $(OBJDIR)/ascii.o: $(COMPONENT_SRC_DIR)/ascii.c $(COMPONENT_INC_DIR)/ascii.h $(P
 $(OBJDIR)/render.o: $(COMPONENT_SRC_DIR)/render.c $(COMPONENT_INC_DIR)/render.h $(COMPONENT_INC_DIR)/ascii.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/render.c -o $(OBJDIR)/render.o
 
+$(OBJDIR)/render_compress.o: $(COMPONENT_SRC_DIR)/render_compress.c $(COMPONENT_INC_DIR)/render_compress.h | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/render_compress.c -o $(OBJDIR)/render_compress.o
+
+# $(OBJDIR)/reader.o: $(COMPONENT_SRC_DIR)/reader.c  | $(OBJDIR)
+# 	$(CC) $(CFLAGS) $(COMPRESSION_SRC_DIR)/decompress.c $(COMPRESSION_SRC_DIR)/bitstream.c $(COMMON_SRC_DIR)/minheap.c $(ALGORITHM_SRC_DIR)/huffman.c $(COMPONENT_SRC_DIR)/reader.c -o $(OBJDIR)/reader
+
+$(OBJDIR)/rle.o: $(ALGORITHM_SRC_DIR)/rle.c $(ALGORITHM_INC_DIR)/rle.h
+	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/rle.c -o $(OBJDIR)/rle.o
+
+$(OBJDIR)/delta.o: $(ALGORITHM_SRC_DIR)/delta.c $(ALGORITHM_INC_DIR)/delta.h
+	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/delta.c -o $(OBJDIR)/delta.o
+
+$(OBJDIR)/huffman.o: $(ALGORITHM_SRC_DIR)/huffman.c $(ALGORITHM_INC_DIR)/huffman.h
+	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/huffman.c -o $(OBJDIR)/huffman.o
+
+$(OBJDIR)/bitstream.o: $(COMPRESSION_SRC_DIR)/bitstream.c $(COMPRESSION_INC_DIR)/bitstream.h
+	$(CC) $(CFLAGS) -c $(COMPRESSION_SRC_DIR)/bitstream.c -o $(OBJDIR)/bitstream.o
+
+$(OBJDIR)/compress.o: $(COMPRESSION_SRC_DIR)/compress.c $(COMPRESSION_INC_DIR)/compress.h
+	$(CC) $(CFLAGS) -c $(COMPRESSION_SRC_DIR)/compress.c -o $(OBJDIR)/compress.o
+
+$(OBJDIR)/decompress.o: $(COMPRESSION_SRC_DIR)/decompress.c $(COMPRESSION_INC_DIR)/decompress.h
+	$(CC) $(CFLAGS) -c $(COMPRESSION_SRC_DIR)/decompress.c -o $(OBJDIR)/decompress.o
+
 $(OBJDIR)/engine.o: $(COMPONENT_SRC_DIR)/engine.c \
 	$(COMPONENT_INC_DIR)/engine.h \
 	$(COMPONENT_INC_DIR)/sequence.h \
@@ -81,15 +105,6 @@ $(OBJDIR)/engine.o: $(COMPONENT_SRC_DIR)/engine.c \
 
 $(OBJDIR)/demo_engine.o: output/demo/demo_engine/demo_engine.c $(COMPONENT_INC_DIR)/engine.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c output/demo/demo_engine/demo_engine.c -o $(OBJDIR)/demo_engine.o
-
-$(OBJDIR)/rle.o: $(ALGORITHM_SRC_DIR)/rle.c $(ALGORITHM_INC_DIR)/rle.h
-	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/rle.c -o $(OBJDIR)/rle.o
-
-$(OBJDIR)/delta.o: $(ALGORITHM_SRC_DIR)/delta.c $(ALGORITHM_INC_DIR)/delta.h
-	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/delta.c -o $(OBJDIR)/delta.o
-
-$(OBJDIR)/huffman.o: $(ALGORITHM_SRC_DIR)/huffman.c $(ALGORITHM_INC_DIR)/huffman.h
-	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/huffman.c -o $(OBJDIR)/huffman.o
 
 $(TESTDIR)/tests_helper.o: tests/tests_helper.c tests/tests_helper.h | $(TESTDIR)
 	$(CC) $(CFLAGS) -c tests/tests_helper.c -o $(TESTDIR)/tests_helper.o
@@ -104,10 +119,10 @@ re: clean all
 # make test TEST=tests/parsers/test_json.c
 # make run_test TEST=tests/components/test_sequence.c
 test: all $(TEST_SUPPORT)
-	@if [ -z "$(TEST)" ]; then \
-		echo "Usage: make test TEST=tests/common/test_io_utils.c"; \
-		exit 1; \
-	fi
+# 	@if [ -z "$(TEST)" ]; then \
+# 		echo "Usage: make test TEST=tests/common/test_io_utils.c"; \
+# 		exit 1; \
+# 	fi
 	$(CC) $(CFLAGS) -c $(TEST) -o $(TESTDIR)/$(notdir $(basename $(TEST))).o
 	$(CC) $(CFLAGS) -o $(TESTDIR)/$(notdir $(basename $(TEST))) \
 		$(OBJ) $(TEST_SUPPORT) $(TESTDIR)/$(notdir $(basename $(TEST))).o
