@@ -63,7 +63,7 @@ void bitreader_read_bits(BitReader *br, int k, unsigned int *out) {
     int i;
 
     if (br->position + k > br->bit_count)
-        return; /* TODO: add error here, not enough bits */
+        return;
 
     for (i = 0; i < k; i++) {
         byte_index = br->position / 8;

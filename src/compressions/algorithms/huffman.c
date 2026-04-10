@@ -256,7 +256,6 @@ HuffmanFSM *huffman_build_fsm(HuffmanNode *root, int K) {
             }
 
             next_state = 0;
-            /* TODO: optimize */
             for (t = 0; t < num_states; t++) {
                 if (nodes[t] == curr) {
                     next_state = t;

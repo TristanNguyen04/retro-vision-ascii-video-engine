@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* TODO: file name and structure to be discussed */
-
 void render_compress_ctx_init(RenderCompressContext *ctx) {
     if (ctx == NULL) {
         return;
@@ -132,7 +130,7 @@ RenderError render_read_header(FILE *fp, RenderCompressContext *ctx) {
             ctx->fsm->table = malloc(
                 ctx->fsm->num_states * table_width * sizeof(FSMEntry));
             if (!ctx->fsm->table)
-                return 1; /* TODO: change to valid error */
+                return 1;
         }
 
         else if (strncmp(line, "FSM_BEGIN", 9) == 0) {
