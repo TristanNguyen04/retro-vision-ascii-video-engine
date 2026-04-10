@@ -158,6 +158,21 @@ static int test_diff_k() {
     return run_test("ABCDEFABCDEFABCDEFABCDEFABCDEF", 1) && run_test("ABCDEFABCDEFABCDEFABCDEFABCDEF", 4) && run_test("ABCDEFABCDEFABCDEFABCDEFABCDEF", 5);
 }
 
+static int test_with_newlines() {
+    return run_test("AAAA\nAAAA\nAAAA\n", 1);
+}
+
+static int test_large() {
+    char input[50000];
+    int i;
+    for (i = 0; i < 49999; i++) {
+        input[i] = (i % 50 == 49) ? '\n' : '@';
+    }
+    input[49999] = '\0';
+
+    return run_test(input, 1);
+}
+
 int main() {
     test_report("huffman basic", test_basic());
     test_report("huffman repeated", test_repeated());
@@ -167,6 +182,8 @@ int main() {
     test_report("huffman long", test_long());
     test_report("huffman symbols", test_symbols());
     test_report("huffman different k", test_diff_k());
+    test_report("huffman with newlines", test_with_newlines());
+    test_report("huffman test large", test_large());
 
     test_summary();
     return test_failed_count() == 0 ? 0 : 1;

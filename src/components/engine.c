@@ -348,7 +348,7 @@ static EngineError engine_open_outputs(
         return ENGINE_ERR_RENDER_OPEN;
     }
 
-    ctx->compress_render_fp = fopen(render_compress_path, "w");
+    ctx->compress_render_fp = fopen(render_compress_path, "wb");
     if (ctx->compress_render_fp == NULL) {
         fclose(ctx->render_fp);
         ctx->render_fp = NULL;

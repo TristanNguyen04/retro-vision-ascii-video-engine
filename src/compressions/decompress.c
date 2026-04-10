@@ -55,13 +55,8 @@ char *decompress_frame_huffman(const RenderCompressContext *ctx,
     }
     bitstr[in->data_bits] = '\0';
 
-    for (i = 0; i < 10; i++) {
-        printf("%c", bitstr[i]);
-    }
-    printf("\n");
-
-    /* original length = width * height */
-    original_len = ctx->width * ctx->height;
+    /* original length = width * height + '\n' for each line */
+    original_len = (ctx->width + 1) * ctx->height;
 
     decoded = huffman_decode(ctx->fsm, bitstr, original_len);
 
