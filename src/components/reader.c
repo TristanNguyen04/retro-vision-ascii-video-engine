@@ -1,3 +1,4 @@
+#include "components/reader.h"
 #include "components/render_compress.h"
 #include "compressions/algorithms/huffman.h"
 #include "compressions/decompress.h"
@@ -22,10 +23,6 @@ read file
       decompress (or not)
       print
 */
-
-int parse_header(FILE *fp, RenderCompressContext *ctx);
-int parse_fsm(FILE *fp, RenderCompressContext *ctx);
-int read_frame(FILE *fp, CompressedFrame *frame);
 
 static void clear_screen() {
 #ifdef _WIN32
@@ -166,7 +163,7 @@ int read_frame(FILE *fp, CompressedFrame *frame) {
     return 0;
 }
 
-void debug_print_fsm(const HuffmanFSM *fsm) {
+static void debug_print_fsm(const HuffmanFSM *fsm) {
     int s, i, k;
     int table_width = 1 << fsm->K;
 
@@ -197,7 +194,7 @@ void debug_print_fsm(const HuffmanFSM *fsm) {
 }
 
 int main(int argc, char *argv[]) {
-    FILE *fp;
+    FILE *fp = NULL;
     RenderCompressContext ctx;
     CompressedFrame frame;
     int frame_count = 0;
@@ -205,7 +202,7 @@ int main(int argc, char *argv[]) {
     unsigned int r;
     char *decoded = NULL;
     size_t frame_size;
-    char *buffer;
+    char *buffer = NULL;
     size_t pos = 0;
     int exit_code = 0;
 
@@ -222,6 +219,7 @@ int main(int argc, char *argv[]) {
 
     /* init context */
     memset(&ctx, 0, sizeof(ctx));
+    memset(&frame, 0, sizeof(frame));
 
     /* allocate FSM if needed */
     ctx.fsm = malloc(sizeof(*ctx.fsm));
