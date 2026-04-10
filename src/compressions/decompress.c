@@ -64,6 +64,34 @@ char *decompress_frame_huffman(const RenderCompressContext *ctx,
     return decoded;
 }
 
+char *decompress_frame_rle(const CompressedFrame *in) {
+    BitReader br;
+    char *encoded;
+    char *decoded;
+    unsigned int val;
+    size_t num_chars, i;
+
+    if (!in || !in->data)
+        return NULL;
+
+    num_chars = in->data_bits / 8;
+    encoded = malloc(num_chars + 1);
+    if (!encoded)
+        return NULL;
+
+    bitreader_init(&br, in->data, in->data_bits);
+
+    for (i = 0; i < num_chars; i++) {
+        bitreader_read_bits(&br, 8, &val);
+        encoded[i] = (char)val;
+    }
+    encoded[num_chars] = '\0';
+
+    decoded = rle_decompress(encoded);
+    free(encoded);
+    return decoded;
+}
+
 char *decompress_frame(const RenderCompressContext *ctx,
                        const CompressedFrame *in) {
     if (!ctx || !in)
@@ -72,7 +100,8 @@ char *decompress_frame(const RenderCompressContext *ctx,
     switch (ctx->compression) {
     case COMPRESS_HUFFMAN:
         return decompress_frame_huffman(ctx, in);
-
+    case COMPRESS_RLE:
+        return decompress_frame_rle(in);
     case COMPRESS_NONE:
     default:
         return decompress_frame_none(in);

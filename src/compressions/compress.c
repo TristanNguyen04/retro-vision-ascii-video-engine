@@ -15,6 +15,7 @@ CompressedFrame compress_frame(const RenderCompressContext *ctx, const AsciiFram
     size_t i;
     unsigned char c, len;
     unsigned int bits;
+    char *encoded = NULL;
 
     memset(&out, 0, sizeof(out));
 
@@ -44,6 +45,19 @@ CompressedFrame compress_frame(const RenderCompressContext *ctx, const AsciiFram
 
             bitwriter_write_bits(&bw, bits, len);
         }
+        break;
+    case COMPRESS_RLE:
+        encoded = rle_compress(flat);
+        if (!encoded) {
+            free(flat);
+            bitwriter_free(&bw);
+            memset(&out, 0, sizeof(out));
+            return out;
+        }
+        for (i = 0; encoded[i]; i++) {
+            bitwriter_write_bits(&bw, (unsigned char)encoded[i], 8);
+        }
+        free(encoded);
         break;
     case COMPRESS_NONE:
     default:
