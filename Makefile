@@ -23,7 +23,7 @@ ALGORITHM_INC_DIR = include/compressions/algorithms
 
 COMMON_OBJ = $(OBJDIR)/io_utils.o $(OBJDIR)/minheap.o
 PARSER_OBJ = $(OBJDIR)/wav.o $(OBJDIR)/bmp.o $(OBJDIR)/json.o $(OBJDIR)/config.o
-COMPONENT_OBJ = $(OBJDIR)/sequence.o $(OBJDIR)/ascii.o $(OBJDIR)/render.o $(OBJDIR)/render_compress.o $(OBJDIR)/engine.o # $(OBJDIR)/reader.o
+COMPONENT_OBJ = $(OBJDIR)/sequence.o $(OBJDIR)/ascii.o $(OBJDIR)/render.o $(OBJDIR)/render_compress.o $(OBJDIR)/engine.o $(OBJDIR)/reader.o
 COMPRESSION_OBJ = $(OBJDIR)/bitstream.o $(OBJDIR)/compress.o $(OBJDIR)/decompress.o  $(OBJDIR)/rle.o  $(OBJDIR)/delta.o $(OBJDIR)/huffman.o 
 
 OBJ = $(COMMON_OBJ) $(PARSER_OBJ) $(COMPONENT_OBJ) $(COMPRESSION_OBJ)
@@ -72,8 +72,8 @@ $(OBJDIR)/render.o: $(COMPONENT_SRC_DIR)/render.c $(COMPONENT_INC_DIR)/render.h 
 $(OBJDIR)/render_compress.o: $(COMPONENT_SRC_DIR)/render_compress.c $(COMPONENT_INC_DIR)/render_compress.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/render_compress.c -o $(OBJDIR)/render_compress.o
 
-# $(OBJDIR)/reader.o: $(COMPONENT_SRC_DIR)/reader.c  | $(OBJDIR)
-# 	$(CC) $(CFLAGS) $(COMPRESSION_SRC_DIR)/decompress.c $(COMPRESSION_SRC_DIR)/bitstream.c $(COMMON_SRC_DIR)/minheap.c $(ALGORITHM_SRC_DIR)/huffman.c $(COMPONENT_SRC_DIR)/reader.c -o $(OBJDIR)/reader
+$(OBJDIR)/reader.o: $(COMPONENT_SRC_DIR)/reader.c  | $(OBJDIR)
+	$(CC) $(CFLAGS) $(COMPRESSION_SRC_DIR)/decompress.c $(COMPRESSION_SRC_DIR)/bitstream.c $(COMMON_SRC_DIR)/minheap.c $(ALGORITHM_SRC_DIR)/huffman.c $(ALGORITHM_SRC_DIR)/rle.c $(ALGORITHM_SRC_DIR)/delta.c $(COMPONENT_SRC_DIR)/reader.c -o $(OBJDIR)/reader
 
 $(OBJDIR)/rle.o: $(ALGORITHM_SRC_DIR)/rle.c $(ALGORITHM_INC_DIR)/rle.h
 	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/rle.c -o $(OBJDIR)/rle.o
