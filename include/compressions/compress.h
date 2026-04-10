@@ -17,6 +17,6 @@ typedef struct CompressedFrame CompressedFrame;
 /**
  * Compress a frame using the given compresstion type algorithm
  */
-CompressedFrame compress_frame(const RenderCompressContext *ctx, const AsciiFrame *frame);
+CompressedFrame compress_frame(RenderCompressContext *ctx, const AsciiFrame *frame);
 
 #endif

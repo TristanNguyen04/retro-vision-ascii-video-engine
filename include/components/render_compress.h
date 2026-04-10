@@ -16,6 +16,9 @@ struct RenderCompressContext {
     unsigned int symbol_freq[256];
     unsigned int codes[256];
     unsigned char code_lengths[256];
+
+    char *delta_prev_frame;
+    int delta_has_prev_frame;
 };
 
 struct CompressedFrame {

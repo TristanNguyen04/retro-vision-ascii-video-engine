@@ -20,6 +20,8 @@ void render_compress_ctx_init(RenderCompressContext *ctx) {
     memset(ctx->symbol_freq, 0, sizeof(ctx->symbol_freq));
     memset(ctx->codes, 0, sizeof(ctx->codes));
     memset(ctx->code_lengths, 0, sizeof(ctx->code_lengths));
+    ctx->delta_prev_frame = NULL;
+    ctx->delta_has_prev_frame = 0;
 }
 
 RenderError render_write_header(FILE *fp, const RenderCompressContext *ctx) {
@@ -220,6 +222,11 @@ RenderError render_read_frame_compressed(FILE *fp, CompressedFrame *frame) {
 void render_compress_ctx_free(RenderCompressContext *ctx) {
     if (ctx == NULL)
         return;
+    if (ctx->delta_prev_frame != NULL) {
+        free(ctx->delta_prev_frame);
+        ctx->delta_prev_frame = NULL;
+    }
+    ctx->delta_has_prev_frame = 0;
     if (ctx->fsm != NULL) {
         huffman_free_fsm(ctx->fsm);
     }
