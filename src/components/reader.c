@@ -207,6 +207,7 @@ int main(int argc, char *argv[]) {
     size_t frame_size;
     char *buffer;
     size_t pos = 0;
+    int exit_code = 0;
 
     if (argc < 2) {
         printf("Usage: %s <compressed_file>\n", argv[0]);
@@ -233,8 +234,8 @@ int main(int argc, char *argv[]) {
     /* parse header */
     if (!parse_header(fp, &ctx)) {
         printf("Failed to parse header\n");
-        fclose(fp);
-        return 1;
+        exit_code = 1;
+        goto cleanup;
     }
 
     printf("Parsed header:\n");
@@ -255,10 +256,18 @@ int main(int argc, char *argv[]) {
         if (ctx.compression == COMPRESS_NONE) {
             bytes = (frame.data_bits + 7) / 8;
             decoded = malloc(bytes + 1);
+            if (!decoded) {
+                exit_code = 1;
+                goto cleanup;
+            }
             memcpy(decoded, frame.data, bytes);
             decoded[bytes] = '\0';
         } else {
             decoded = decompress_frame(&ctx, &frame);
+            if (!decoded) {
+                exit_code = 1;
+                goto cleanup;
+            }
         }
 
         printf("\n");
@@ -270,6 +279,10 @@ int main(int argc, char *argv[]) {
 
         frame_size = ctx.width * ctx.height + ctx.height;
         buffer = malloc(frame_size + 1);
+        if (!buffer) {
+            exit_code = 1;
+            goto cleanup;
+        }
 
         pos = 0;
         for (r = 0; r < ctx.height; r++) {
@@ -284,17 +297,35 @@ int main(int argc, char *argv[]) {
         sleep_ms(100);
 
         free(decoded);
+        decoded = NULL;
         free(frame.data);
+        frame.data = NULL;
 
         frame_count++;
     }
 
     printf("\nTotal frames: %d\n", frame_count);
 
-    fclose(fp);
+cleanup:
+    if (ctx.fsm) {
+        debug_print_fsm(ctx.fsm);
+    }
+    if (buffer) {
+        free(buffer);
+    }
+    if (decoded) {
+        free(decoded);
+    }
+    if (frame.data) {
+        free(frame.data);
+    }
+    if (ctx.fsm) {
+        huffman_free_fsm(ctx.fsm);
+        ctx.fsm = NULL;
+    }
+    if (fp) {
+        fclose(fp);
+    }
 
-    /* TODO: free FSM properly (entries + symbols) */
-    debug_print_fsm(ctx.fsm);
-
-    return 0;
+    return exit_code;
 }
