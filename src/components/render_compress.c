@@ -33,8 +33,8 @@ RenderError render_write_header(FILE *fp, const RenderCompressContext *ctx) {
         return RENDER_ERR_NULL_ARG;
 
     fprintf(fp, "FORMAT ASCII_VIDEO\n");
-    fprintf(fp, "WIDTH %u\n", 640);  /* ctx->width); */
-    fprintf(fp, "HEIGHT %u\n", 360); /* ctx->height); */
+    fprintf(fp, "WIDTH %u\n", ctx->width);
+    fprintf(fp, "HEIGHT %u\n", ctx->height);
     fprintf(fp, "COMPRESSION %d\n", ctx->compression);
 
     if (ctx->compression == COMPRESS_HUFFMAN) {

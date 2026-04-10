@@ -433,6 +433,12 @@ static EngineError engine_collect_stats(EngineContext *ctx) {
             return ENGINE_ERR_ASCII;
         }
 
+        if (ctx->render_compress_ctx.width == 0U &&
+            ctx->render_compress_ctx.height == 0U) {
+            ctx->render_compress_ctx.width = (unsigned int)ascii_frame.width;
+            ctx->render_compress_ctx.height = (unsigned int)ascii_frame.height;
+        }
+
         flat = flatten_ascii_frame(&ascii_frame);
         if (!flat) {
             bmp_free(&bmp);
