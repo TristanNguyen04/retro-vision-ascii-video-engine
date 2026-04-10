@@ -5,6 +5,7 @@ OBJDIR = build
 TESTDIR = $(OBJDIR)/tests
 
 TARGET = retrovision
+READER_TARGET = reader
 MAIN_OBJ = $(OBJDIR)/demo_engine.o
 
 COMMON_SRC_DIR = src/common
@@ -23,7 +24,7 @@ ALGORITHM_INC_DIR = include/compressions/algorithms
 
 COMMON_OBJ = $(OBJDIR)/io_utils.o $(OBJDIR)/minheap.o
 PARSER_OBJ = $(OBJDIR)/wav.o $(OBJDIR)/bmp.o $(OBJDIR)/json.o $(OBJDIR)/config.o
-COMPONENT_OBJ = $(OBJDIR)/sequence.o $(OBJDIR)/ascii.o $(OBJDIR)/render.o $(OBJDIR)/render_compress.o $(OBJDIR)/engine.o $(OBJDIR)/reader.o
+COMPONENT_OBJ = $(OBJDIR)/sequence.o $(OBJDIR)/ascii.o $(OBJDIR)/render.o $(OBJDIR)/render_compress.o $(OBJDIR)/engine.o 
 COMPRESSION_OBJ = $(OBJDIR)/bitstream.o $(OBJDIR)/compress.o $(OBJDIR)/decompress.o  $(OBJDIR)/rle.o  $(OBJDIR)/delta.o $(OBJDIR)/huffman.o 
 
 OBJ = $(COMMON_OBJ) $(PARSER_OBJ) $(COMPONENT_OBJ) $(COMPRESSION_OBJ)
@@ -31,10 +32,13 @@ TEST_SUPPORT = $(TESTDIR)/tests_helper.o
 
 .PHONY: all clean re test run_test
 
-all: $(TARGET)
+all: $(TARGET) $(READER_TARGET)
 
 $(TARGET): $(OBJ) $(MAIN_OBJ)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) $(MAIN_OBJ)
+
+$(READER_TARGET): $(OBJDIR)/reader.o
+	$(CC) $(CFLAGS) -o $(READER_TARGET) $(OBJDIR)/reader.o $(OBJ)
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
@@ -72,8 +76,8 @@ $(OBJDIR)/render.o: $(COMPONENT_SRC_DIR)/render.c $(COMPONENT_INC_DIR)/render.h 
 $(OBJDIR)/render_compress.o: $(COMPONENT_SRC_DIR)/render_compress.c $(COMPONENT_INC_DIR)/render_compress.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/render_compress.c -o $(OBJDIR)/render_compress.o
 
-$(OBJDIR)/reader.o: $(COMPONENT_SRC_DIR)/reader.c  | $(OBJDIR)
-	$(CC) $(CFLAGS) $(COMPRESSION_SRC_DIR)/decompress.c $(COMPRESSION_SRC_DIR)/bitstream.c $(COMMON_SRC_DIR)/minheap.c $(ALGORITHM_SRC_DIR)/huffman.c $(ALGORITHM_SRC_DIR)/rle.c $(ALGORITHM_SRC_DIR)/delta.c $(COMPONENT_SRC_DIR)/reader.c -o $(OBJDIR)/reader
+$(OBJDIR)/reader.o: $(COMPONENT_SRC_DIR)/reader.c | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/reader.c -o $(OBJDIR)/reader.o
 
 $(OBJDIR)/rle.o: $(ALGORITHM_SRC_DIR)/rle.c $(ALGORITHM_INC_DIR)/rle.h
 	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/rle.c -o $(OBJDIR)/rle.o
@@ -119,10 +123,10 @@ re: clean all
 # make test TEST=tests/parsers/test_json.c
 # make run_test TEST=tests/components/test_sequence.c
 test: all $(TEST_SUPPORT)
-# 	@if [ -z "$(TEST)" ]; then \
-# 		echo "Usage: make test TEST=tests/common/test_io_utils.c"; \
-# 		exit 1; \
-# 	fi
+	@if [ -z "$(TEST)" ]; then \
+		echo "Usage: make test TEST=tests/common/test_io_utils.c"; \
+		exit 1; \
+	fi
 	$(CC) $(CFLAGS) -c $(TEST) -o $(TESTDIR)/$(notdir $(basename $(TEST))).o
 	$(CC) $(CFLAGS) -o $(TESTDIR)/$(notdir $(basename $(TEST))) \
 		$(OBJ) $(TEST_SUPPORT) $(TESTDIR)/$(notdir $(basename $(TEST))).o
