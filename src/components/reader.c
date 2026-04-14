@@ -24,7 +24,7 @@ read file
       print
 */
 
-static void clear_screen() {
+static void clear_screen(void) {
 #ifdef _WIN32
     system("cls");
 #else
