@@ -110,6 +110,15 @@ $(OBJDIR)/engine.o: $(COMPONENT_SRC_DIR)/engine.c \
 $(OBJDIR)/demo_engine.o: output/demo/demo_engine/demo_engine.c $(COMPONENT_INC_DIR)/engine.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c output/demo/demo_engine/demo_engine.c -o $(OBJDIR)/demo_engine.o
 
+$(OBJDIR)/rle.o: $(ALGORITHM_SRC_DIR)/rle.c $(ALGORITHM_INC_DIR)/rle.h
+	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/rle.c -o $(OBJDIR)/rle.o
+
+$(OBJDIR)/delta.o: $(ALGORITHM_SRC_DIR)/delta.c $(ALGORITHM_INC_DIR)/delta.h
+	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/delta.c -o $(OBJDIR)/delta.o
+
+$(OBJDIR)/huffman.o: $(ALGORITHM_SRC_DIR)/huffman.c $(ALGORITHM_INC_DIR)/huffman.h
+	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/huffman.c -o $(OBJDIR)/huffman.o
+
 $(TESTDIR)/tests_helper.o: tests/tests_helper.c tests/tests_helper.h | $(TESTDIR)
 	$(CC) $(CFLAGS) -c tests/tests_helper.c -o $(TESTDIR)/tests_helper.o
 
