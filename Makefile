@@ -5,7 +5,7 @@ OBJDIR = build
 TESTDIR = $(OBJDIR)/tests
 
 TARGET = retrovision
-READER_TARGET = reader
+PREVIEW_TARGET = preview
 MAIN_OBJ = $(OBJDIR)/demo_engine.o
 
 COMMON_SRC_DIR = src/common
@@ -32,13 +32,13 @@ TEST_SUPPORT = $(TESTDIR)/tests_helper.o
 
 .PHONY: all clean re test run_test
 
-all: $(TARGET) $(READER_TARGET)
+all: $(TARGET) $(PREVIEW_TARGET)
 
 $(TARGET): $(OBJ) $(MAIN_OBJ)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) $(MAIN_OBJ)
 
-$(READER_TARGET): $(OBJDIR)/reader.o
-	$(CC) $(CFLAGS) -o $(READER_TARGET) $(OBJDIR)/reader.o $(OBJ)
+$(PREVIEW_TARGET): $(OBJDIR)/preview.o
+	$(CC) $(CFLAGS) -o $(PREVIEW_TARGET) $(OBJDIR)/preview.o $(OBJ)
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
@@ -76,8 +76,8 @@ $(OBJDIR)/render.o: $(COMPONENT_SRC_DIR)/render.c $(COMPONENT_INC_DIR)/render.h 
 $(OBJDIR)/render_compress.o: $(COMPONENT_SRC_DIR)/render_compress.c $(COMPONENT_INC_DIR)/render_compress.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/render_compress.c -o $(OBJDIR)/render_compress.o
 
-$(OBJDIR)/reader.o: $(COMPONENT_SRC_DIR)/reader.c | $(OBJDIR)
-	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/reader.c -o $(OBJDIR)/reader.o
+$(OBJDIR)/preview.o: $(COMPONENT_SRC_DIR)/preview.c | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/preview.c -o $(OBJDIR)/preview.o
 
 $(OBJDIR)/rle.o: $(ALGORITHM_SRC_DIR)/rle.c $(ALGORITHM_INC_DIR)/rle.h
 	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/rle.c -o $(OBJDIR)/rle.o

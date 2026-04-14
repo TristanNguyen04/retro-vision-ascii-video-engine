@@ -1,3 +1,5 @@
 build
 docs/planning
 frames
+output/demo/**/*.txt
+output/demo/**/*.log

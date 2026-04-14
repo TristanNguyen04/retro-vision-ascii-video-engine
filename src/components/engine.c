@@ -464,8 +464,6 @@ static EngineError engine_prepare_compression(EngineContext *ctx) {
     unsigned char symbols[256];
     size_t i;
 
-    printf("I am so tired but still okay!");
-
     if (!ctx)
         return ENGINE_ERR_NULL_ARG;
 
