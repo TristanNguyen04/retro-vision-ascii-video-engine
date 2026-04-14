@@ -2,6 +2,7 @@
 #include "parsers/json/json.h"
 
 #include <string.h>
+#include <stdio.h>
 
 #define CONFIG_DEFAULT_FRAME_PREFIX "frame_"
 #define CONFIG_DEFAULT_FRAME_EXTENSION ".bmp"
@@ -33,6 +34,9 @@ void config_init(EngineConfig * config){
     config->start_frame = 0U;
     config->end_frame = 0U;
 
+    config->compress_algorithm[0] = '\0';
+    config->huffman_K = 0U;
+
     config->palette[0] = '\0';
     config->threshold = 0U;
 }
@@ -54,7 +58,7 @@ ConfigError config_load(const char * filename, EngineConfig * config){
         json_free(&obj);
         return CONFIG_ERR_JSON_LOAD;
     }
-
+    
     config_err = config_validate_allowed_keys(&obj);
     if(config_err != CONFIG_OK){
         json_free(&obj);
@@ -100,6 +104,20 @@ ConfigError config_load(const char * filename, EngineConfig * config){
     }
 
     config_err = config_get_uint(&obj, "threshold", &config->threshold, 0);
+    if(config_err != CONFIG_OK){
+        json_free(&obj);
+        config_init(config);
+        return config_err;
+    }
+
+    config_err = config_get_string(&obj, "compression_algorithm", config->compress_algorithm, sizeof(config->compress_algorithm), 0);
+    if(config_err != CONFIG_OK){
+        json_free(&obj);
+        config_init(config);
+        return config_err;
+    }
+
+    config_err = config_get_uint(&obj, "huffman_K", &config->huffman_K, 1);
     if(config_err != CONFIG_OK){
         json_free(&obj);
         config_init(config);
@@ -207,6 +225,8 @@ static int config_is_allowed_key(const char * key){
            strcmp(key, "start_frame") == 0 ||
            strcmp(key, "end_frame") == 0 ||
            strcmp(key, "palette") == 0 ||
+           strcmp(key, "compression_algorithm") == 0 ||
+           strcmp(key, "huffman_K") == 0 ||
            strcmp(key, "threshold") == 0;
 }
 

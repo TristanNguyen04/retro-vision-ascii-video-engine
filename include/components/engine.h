@@ -39,6 +39,7 @@ EngineError engine_run(
     const char * config_path,
     const char * wav_path,
     const char * render_path,
+    const char * render_compress_path, 
     const char * log_path
 );
 

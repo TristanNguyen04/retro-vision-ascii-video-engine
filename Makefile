@@ -5,6 +5,7 @@ OBJDIR = build
 TESTDIR = $(OBJDIR)/tests
 
 TARGET = retrovision
+PREVIEW_TARGET = preview
 MAIN_OBJ = $(OBJDIR)/demo_engine.o
 
 COMMON_SRC_DIR = src/common
@@ -23,18 +24,21 @@ ALGORITHM_INC_DIR = include/compressions/algorithms
 
 COMMON_OBJ = $(OBJDIR)/io_utils.o $(OBJDIR)/minheap.o
 PARSER_OBJ = $(OBJDIR)/wav.o $(OBJDIR)/bmp.o $(OBJDIR)/json.o $(OBJDIR)/config.o
-COMPONENT_OBJ = $(OBJDIR)/sequence.o $(OBJDIR)/ascii.o $(OBJDIR)/render.o $(OBJDIR)/engine.o
-COMPRESSION_OBJ = $(OBJDIR)/rle.o  $(OBJDIR)/delta.o $(OBJDIR)/huffman.o
+COMPONENT_OBJ = $(OBJDIR)/sequence.o $(OBJDIR)/ascii.o $(OBJDIR)/render.o $(OBJDIR)/render_compress.o $(OBJDIR)/engine.o 
+COMPRESSION_OBJ = $(OBJDIR)/bitstream.o $(OBJDIR)/compress.o $(OBJDIR)/decompress.o  $(OBJDIR)/rle.o  $(OBJDIR)/delta.o $(OBJDIR)/huffman.o 
 
 OBJ = $(COMMON_OBJ) $(PARSER_OBJ) $(COMPONENT_OBJ) $(COMPRESSION_OBJ)
 TEST_SUPPORT = $(TESTDIR)/tests_helper.o
 
 .PHONY: all clean re test run_test
 
-all: $(TARGET)
+all: $(TARGET) $(PREVIEW_TARGET)
 
 $(TARGET): $(OBJ) $(MAIN_OBJ)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) $(MAIN_OBJ)
+
+$(PREVIEW_TARGET): $(OBJDIR)/preview.o
+	$(CC) $(CFLAGS) -o $(PREVIEW_TARGET) $(OBJDIR)/preview.o $(OBJ)
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
@@ -68,6 +72,30 @@ $(OBJDIR)/ascii.o: $(COMPONENT_SRC_DIR)/ascii.c $(COMPONENT_INC_DIR)/ascii.h $(P
 
 $(OBJDIR)/render.o: $(COMPONENT_SRC_DIR)/render.c $(COMPONENT_INC_DIR)/render.h $(COMPONENT_INC_DIR)/ascii.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/render.c -o $(OBJDIR)/render.o
+
+$(OBJDIR)/render_compress.o: $(COMPONENT_SRC_DIR)/render_compress.c $(COMPONENT_INC_DIR)/render_compress.h | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/render_compress.c -o $(OBJDIR)/render_compress.o
+
+$(OBJDIR)/preview.o: $(COMPONENT_SRC_DIR)/preview.c | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $(COMPONENT_SRC_DIR)/preview.c -o $(OBJDIR)/preview.o
+
+$(OBJDIR)/rle.o: $(ALGORITHM_SRC_DIR)/rle.c $(ALGORITHM_INC_DIR)/rle.h
+	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/rle.c -o $(OBJDIR)/rle.o
+
+$(OBJDIR)/delta.o: $(ALGORITHM_SRC_DIR)/delta.c $(ALGORITHM_INC_DIR)/delta.h
+	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/delta.c -o $(OBJDIR)/delta.o
+
+$(OBJDIR)/huffman.o: $(ALGORITHM_SRC_DIR)/huffman.c $(ALGORITHM_INC_DIR)/huffman.h
+	$(CC) $(CFLAGS) -c $(ALGORITHM_SRC_DIR)/huffman.c -o $(OBJDIR)/huffman.o
+
+$(OBJDIR)/bitstream.o: $(COMPRESSION_SRC_DIR)/bitstream.c $(COMPRESSION_INC_DIR)/bitstream.h
+	$(CC) $(CFLAGS) -c $(COMPRESSION_SRC_DIR)/bitstream.c -o $(OBJDIR)/bitstream.o
+
+$(OBJDIR)/compress.o: $(COMPRESSION_SRC_DIR)/compress.c $(COMPRESSION_INC_DIR)/compress.h
+	$(CC) $(CFLAGS) -c $(COMPRESSION_SRC_DIR)/compress.c -o $(OBJDIR)/compress.o
+
+$(OBJDIR)/decompress.o: $(COMPRESSION_SRC_DIR)/decompress.c $(COMPRESSION_INC_DIR)/decompress.h
+	$(CC) $(CFLAGS) -c $(COMPRESSION_SRC_DIR)/decompress.c -o $(OBJDIR)/decompress.o
 
 $(OBJDIR)/engine.o: $(COMPONENT_SRC_DIR)/engine.c \
 	$(COMPONENT_INC_DIR)/engine.h \

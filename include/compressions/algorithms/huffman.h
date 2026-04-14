@@ -22,9 +22,14 @@ typedef struct {
     int K;
 } HuffmanFSM;
 
-HuffmanNode *huffman_build_tree(char data[], int freq[], int size);
+typedef struct {
+    unsigned int bits;
+    int length;
+} HuffmanCode;
 
-void huffman_generate_codes(HuffmanNode *root);
+HuffmanNode *huffman_build_tree(unsigned char data[], unsigned int freq[], int size);
+
+void huffman_generate_codes(HuffmanNode *root, HuffmanCode table[256]);
 
 char *huffman_encode(HuffmanNode *root, const char *text, int K);
 

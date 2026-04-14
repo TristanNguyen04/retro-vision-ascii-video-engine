@@ -1,6 +1,8 @@
 #ifndef COMPRESS_H
 #define COMPRESS_H
 
+#include "components/ascii.h"
+
 typedef enum {
     COMPRESS_NONE,
     COMPRESS_RLE,
@@ -8,9 +10,13 @@ typedef enum {
     COMPRESS_HUFFMAN
 } CompressionType;
 
+/* declaration in render_compress.h */
+typedef struct RenderCompressContext RenderCompressContext;
+typedef struct CompressedFrame CompressedFrame;
+
 /**
- * Compress a string input using the given compresstion type algorithm
+ * Compress a frame using the given compresstion type algorithm
  */
-char *compress_data(const char *input, CompressionType type);
+CompressedFrame compress_frame(RenderCompressContext *ctx, const AsciiFrame *frame);
 
 #endif
