@@ -1,4 +1,4 @@
-#include "components/reader.h"
+#include "components/preview.h"
 #include "components/render_compress.h"
 #include "compressions/algorithms/huffman.h"
 #include "compressions/decompress.h"

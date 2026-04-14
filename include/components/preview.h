@@ -1,5 +1,5 @@
-#ifndef READER_H
-#define READER_H
+#ifndef PREVIEW_H
+#define PREVIEW_H
 
 #include "components/render_compress.h"
 #include <stdio.h>

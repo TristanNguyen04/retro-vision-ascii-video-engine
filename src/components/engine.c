@@ -464,11 +464,17 @@ static EngineError engine_prepare_compression(EngineContext *ctx) {
     unsigned char symbols[256];
     size_t i;
 
+    printf("I am so tired but still okay!");
+
     if (!ctx)
         return ENGINE_ERR_NULL_ARG;
 
     /* Convert compression string → enum */
     if (strcmp(ctx->config.compress_algorithm, "huffman") == 0) {
+        if(ctx->config.huffman_K <= 0) {
+            return ENGINE_ERR_CONFIG;
+        }
+
         ctx->render_compress_ctx.compression = COMPRESS_HUFFMAN;
     } else if (strcmp(ctx->config.compress_algorithm, "delta") == 0) {
         ctx->render_compress_ctx.compression = COMPRESS_DELTA;
@@ -477,7 +483,7 @@ static EngineError engine_prepare_compression(EngineContext *ctx) {
     } else if (strcmp(ctx->config.compress_algorithm, "none") == 0) {
         ctx->render_compress_ctx.compression = COMPRESS_NONE;
     } else {
-        return ENGINE_ERR_NULL_ARG;
+        return ENGINE_ERR_CONFIG;
     }
 
     /* If no compression, nothing else to prepare */
