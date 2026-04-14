@@ -1,0 +1,83 @@
+\section{Challenges, Trade-offs, and Engineering Decisions}
+
+\subsection{Heterogeneous inputs and parser robustness}
+The system must accept three \emph{different} input modalities: a text-based JSON configuration, a structured binary WAV stream, and bitmap frames with a binary DIB layout. Each format has its own failure modes (invalid signatures, inconsistent header fields, unsupported bit depths or audio encodings, malformed JSON).
+
+\textbf{Challenge.} A single ``generic'' read loop cannot validate all three; each parser needs domain checks, yet the engine must see a uniform success/failure vocabulary.
+
+\textbf{Response.} We implemented dedicated parsers with small, explicit APIs and typed error enums (e.g.\ \texttt{BmpError}, \texttt{WavError}, \texttt{ConfigError}), then mapped failures into engine-level outcomes. Configuration adds a \textbf{whitelist of keys} and type checking so corrupt policy cannot silently propagate into runtime.
+
+\textbf{Trade-off (strictness \emph{vs.} flexibility).} Strict rules---such as rejecting unknown JSON keys and requiring \texttt{.bmp} frame extensions in configuration validation---improve safety and grading clarity, but reduce ``bring any file'' flexibility. A more permissive design would need richer diagnostics and broader format support, which was out of scope for a course-sized engine.
+
+\subsection{Temporal synchronization and audio-driven highlighting}
+Video frames are discrete, while audio is a continuous waveform sampled at a rate that need not be an integer multiple of the configured \texttt{fps}. The engine maps each frame index to a half-open sample interval using \textbf{integer division} in C:
+\begin{quote}
+\small
+\texttt{start\_sample = (relative\_index * sample\_rate) / fps}\\
+\texttt{end\_sample = ((relative\_index + 1U) * sample\_rate) / fps}
+\end{quote}
+\noindent (See \url{src/components/engine.c} in \url{engine_process_one_frame}, before \url{wav_average_amplitude}.)
+
+\textbf{Challenge.} Rounding partitions the audio timeline into windows that are approximately one frame long but not perfectly equal in samples; extreme \texttt{fps}/sample-rate combinations can make boundary effects visible in thresholding behavior.
+
+\textbf{Response.} We tried to keep the mapping \textbf{deterministic and documented}: average absolute amplitude over each window is compared to a single user threshold to set a boolean highlight flag. This is simple to explain, test, and reproduce across machines.
+
+\textbf{Trade-off (accuracy \emph{vs.} simplicity).} More advanced alignment (sub-frame interpolation, perceptual loudness, or peak detection) could track human hearing better, but would add complexity and subjective tuning beyond the project brief.
+
+\subsection{Raw fidelity, storage footprint, and compression modes}
+Uncompressed ASCII timelines are excellent for debugging and inspection, but can be very large for long frame ranges. The compression track targets smaller artifacts and preview playback.
+
+\textbf{Challenge.} Different algorithms optimize for different statistics: run-length and delta coding are cheap conceptually but vary with frame content; Huffman coding can exploit global symbol frequencies but requires additional preparation.
+
+\textbf{Response.} The engine supports multiple modes (\texttt{none}, \texttt{rle}, \texttt{delta}, \texttt{huffman}) selected via configuration. For Huffman, the implementation performs a \textbf{pre-pass} over the frame range (\url{engine_collect_stats} in \url{src/components/engine.c}) to accumulate byte-level symbol counts before building codes and decoder tables. That guarantees a consistent codebook for the sequence at the cost of extra work up front.
+
+\textbf{Trade-off (compression ratio \emph{vs.} encode/decode complexity).} Stronger compression often implies more book-keeping (tables, FSM metadata in the compressed file, preview reconstruction). We accepted that complexity because it directly supports the product goal of \emph{usable} outputs, not only raw dumps.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \caption{Representative engineering trade-offs and adopted resolutions.}
+    \label{tab:tradeoffs}
+    \begin{tabularx}{\textwidth}{@{} >{\raggedright\arraybackslash}p{2.6cm} X X X @{}}
+        \toprule
+        \textbf{Decision axis} & \textbf{Benefit} & \textbf{Cost / risk} & \textbf{Chosen direction} \\
+        \midrule
+        Parser strictness &
+        Predictable failures; easier grading and debugging. &
+        Rejects some ``almost valid'' media or configs users might try. &
+        Strict config + format subset (JSON/WAV/BMP) with clear errors. \\
+        \addlinespace
+        Audio windowing &
+        Simple, reproducible frame--audio mapping. &
+        Integer division yields slightly uneven windows; threshold tuning sensitive. &
+        Fixed formula + threshold flag in JSON config. \\
+        \addlinespace
+        Raw + compressed outputs &
+        Transparency (raw) and practical storage/playback (compressed). &
+        Two output paths to maintain; preview must track writer format. &
+        Emit both; document container layout in code (\url{render_compress.h}). \\
+        \addlinespace
+        Huffman pre-pass &
+        Global frequencies improve coding for the whole clip. &
+        Extra full-frame traversal before final encode; more implementation work. &
+        \texttt{COLLECT\_STAT} stage in engine FSM; used only when needed. \\
+        \addlinespace
+        Engine error buckets &
+        Stable top-level outcomes for the CLI. &
+        Fine-grained BMP/WAV causes collapse to a few \texttt{ENGINE\_ERR\_*} codes. &
+        Keep module-level enums for tests; engine returns coarse codes. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{State-machine orchestration and maintainability}
+The engine coordinates many steps (load config, load audio, prepare sequence, optional statistics pass, compression setup, open outputs, per-frame loop, summary). A monolithic ``mega-function'' would be difficult to reason about under \texttt{-Wall -Werror -ansi -pedantic}.
+
+\textbf{Response.} A finite state machine in \url{engine_run} (\url{src/components/engine.c}) isolates stages and makes failure handling explicit: a stage error transitions to a terminal error state and returns a single engine code.
+
+\textbf{Trade-off.} More states mean more bookkeeping when adding features, but the structure paid off whenever compression logic or output paths evolved, because new work could be scoped to one or two states.
+
+\subsection{Risk handling, testing, and debugging}
+Module tests under \url{tests/parsers}, \url{tests/components}, and \url{tests/compressions} focus on boundary conditions and negative inputs (malformed files, missing keys, wrong types). They do not replace a full end-to-end harness for every engine failure mode, but they \textbf{anchor} parser and codec behavior so refactors are safer.
+
+\textbf{Operational debugging.} The textual \url{process.log} and reproducible command lines (\texttt{make}, \texttt{retrovision}, \texttt{preview}) allowed us to compare behavior before and after a merge---complementing Git history with runtime evidence.

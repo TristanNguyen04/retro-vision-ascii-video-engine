@@ -1,5 +1,15 @@
 build
 docs/planning
-frames
 output/demo/**/*.txt
 output/demo/**/*.log
+
+# LaTeX Intermediate Compiled Files
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+docs/report/*.log
+*.out
+*.toc
+*.synctex.gz

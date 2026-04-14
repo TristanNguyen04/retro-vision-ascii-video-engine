@@ -1,0 +1,39 @@
+\section{Outcomes, Learning, and Future Work}
+
+This closing section states what the team delivered, why the compression and preview path matters for users, what we learned from building the system in C with minimal dependencies, and which improvements would come next. \textbf{Version control on GitHub} supported low-friction integration (Section~4); the outcomes below are about \emph{product and technical} results rather than merge mechanics.
+
+\subsection{Project outcomes}
+The completed system is an end-to-end \textbf{ASCII video engine} with a \textbf{playback-oriented delivery layer}:
+
+\begin{itemize}
+    \item \textbf{Inputs:} JSON configuration (\texttt{compression\_algorithm}, frame range, palette, threshold, optional Huffman parameters, frame naming rules), a PCM WAV file, and a sequence of BMP frames (\url{src/parsers/json/}, \url{src/parsers/wav.c}, \url{src/parsers/bmp.c}).
+    \item \textbf{Core processing:} A state-machine-driven engine loads each frame, maps it to an audio sample window, derives a highlight flag from average amplitude, renders ASCII, and writes a human-readable timeline plus a process log (\url{src/components/engine.c}, \url{src/components/render.c}).
+    \item \textbf{Compression and packaging:} Frame payloads are compressed according to the selected mode and written with a documented header and per-frame records (\url{src/compressions/}, \url{src/components/render_compress.c}).
+    \item \textbf{Playback:} The \texttt{preview} program reads the compressed file, reconstructs context (including Huffman-related metadata when applicable), decompresses each frame, and displays animated ASCII in the terminal (\url{src/components/preview.c}).
+    \item \textbf{Build and validation:} A single \url{Makefile} builds \texttt{retrovision} and \texttt{preview} with strict flags (\texttt{-Wall -Werror -ansi -pedantic}); targeted tests under \url{tests/} support regression checking after changes.
+\end{itemize}
+
+\subsection{User experience: compression and preview are core}
+The compressed output and preview loop are not an optional add-on. They address a practical constraint that appears immediately in real use: \textbf{raw ASCII render files grow quickly} with frame count and resolution, which makes storage, transfer, and repeated inspection costly.
+
+\textbf{Why this matters.} A user (or grader) can still open the plain render for line-by-line verification, but day-to-day interaction---checking motion, timing, and highlight behavior---is far more feasible against a compressed artifact plus \texttt{preview}. We therefore treats compression/decompression and preview as \textbf{first-class product requirements}, aligned with the course emphasis on file processing and stateful decoding, not only on rendering correctness.
+
+\subsection{What we learned}
+
+\begin{description}[style=nextline, leftmargin=0pt, labelsep=0.8em]
+    \item[\textbf{Parser and engine track.}] We deepened experience with \textbf{binary file discipline} (WAV/BMP layout assumptions, careful reads, and early validation), \textbf{JSON-as-config} with strict schema policy, and \textbf{state-machine orchestration} for multi-stage pipelines. We also learned how quickly ``small'' integration details (e.g.\ frame path templates) become user-visible failures when config and data disagree.
+    \item[\textbf{Compression and preview track.}] We learned to treat codecs as \textbf{contracts}: the encoder and decoder must agree on symbols, bit packing, and container markers. Implementing Huffman preparation (e.g.\ symbol statistics before the final pass) reinforced that compression is not only algorithmic cleverness but also \textbf{systems engineering} (memory, determinism, and on-disk interoperability with \texttt{preview}).
+\end{description}
+
+\subsection{Future improvements}
+The following items are \textbf{planned} enhancements; they are not required to claim the current milestone, but they are the natural next engineering steps:
+
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{End-to-end integration tests:} A small harness that runs \texttt{retrovision} on a tiny fixture (few frames + short WAV) and asserts non-empty outputs, stable exit codes, and round-trip preview behavior would guard regressions across parser, engine, and compression boundaries.
+    \item \textbf{Benchmark automation:} Scripted runs to record wall time and output sizes for each compression mode (numbers should be produced by scripts, not invented in prose).
+    \item \textbf{Broader format support and diagnostics:} Optional extensions might include additional WAV encodings or BMP variants, plus richer error messages (while keeping the ``no mystery dependencies'' philosophy).
+    \item \textbf{Documentation of expected artifacts:} A short maintainer note listing canonical demo commands and expected files under \url{output/demo/} would further lower onboarding cost for new contributors.
+\end{enumerate}
+
+\subsection{Closing remarks}
+The project demonstrates that a small pure-C codebase can still deliver a credible multimedia-to-text pipeline: custom parsers, explicit state machines, mixed text/binary I/O, and a user-facing compression and preview story. The hardest lessons were not about any single function, but about \textbf{keeping contracts stable} across modules while preserving strictness and reproducibility. That balance---technical depth with pragmatic usability---is what we hope a reader takes away as the project's primary outcome.
