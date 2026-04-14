@@ -8,5 +8,6 @@
   "end_frame": 700,
   "palette": "@#*+=-:.",
   "threshold": 5000,
-  "compression_algorithm": "delta"
+  "compression_algorithm": "huffman",
+  "huffman_K": 1
 }
