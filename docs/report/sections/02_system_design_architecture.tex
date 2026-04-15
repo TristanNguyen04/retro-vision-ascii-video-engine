@@ -1,0 +1,111 @@
+\section{System Design and Architecture}
+
+\subsection{High-Level Architecture}
+The system is designed as a two-layer architecture that separates content generation from content delivery.
+
+\begin{itemize}
+    \item \textbf{Layer A --- generation pipeline:} custom parsers load configuration and media inputs, while the engine orchestrates synchronization and frame-by-frame ASCII rendering.
+    \item \textbf{Layer B --- delivery pipeline:} rendered frames are compressed into a compact file format, then replayed through a preview path that reconstructs and displays frames.
+\end{itemize}
+
+This separation improves maintainability and directly supports user-facing needs: high-fidelity raw output for inspection and compressed output for practical storage and playback.
+
+\subsection{Module Hierarchy}
+The repository is organized around clear functional boundaries:
+
+\begin{itemize}
+    \item \textbf{Parser modules} (\url{src/parsers}): JSON/config parsing, WAV parsing, and BMP parsing.
+    \item \textbf{Engine and rendering modules} (\url{src/components}): sequence path logic, ASCII conversion, rendering, compressed render I/O, and engine orchestration.
+    \item \textbf{Compression modules} (\url{src/compressions}): compression/decompression dispatch and algorithm implementations (\url{none}, \texttt{rle}, \texttt{delta}, \texttt{huffman}).
+    \item \textbf{Public interfaces} (\url{include/...}): typed APIs and shared data structures per subsystem.
+    \item \textbf{Validation modules} (\url{tests/...}): subsystem-level tests for parser, component, and compression behavior.
+\end{itemize}
+
+The resulting hierarchy keeps file-format concerns, orchestration logic, and storage optimization logic decoupled while still integrating through explicit interfaces.
+
+\subsection{End-to-End Data Flow}
+At runtime, the engine consumes three inputs:
+\begin{enumerate}[label=\arabic*)]
+    \item JSON configuration (frame range, frame naming rules, palette, threshold, compression settings);
+    \item WAV audio stream;
+    \item BMP frame sequence.
+\end{enumerate}
+
+The engine first validates and prepares context (configuration, audio metadata, frame range), then processes each frame by loading image data, mapping it to the corresponding audio interval, rendering ASCII, and writing outputs. The system produces:
+\begin{itemize}
+    \item raw ASCII render text;
+    \item compressed frame output;
+    \item process log for traceability and debugging.
+\end{itemize}
+
+The preview program then reads the compressed output file, reconstructs compression context (including Huffman FSM metadata when applicable), decompresses frame payloads, and prints animated ASCII to the terminal.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/fig2.pdf}
+    % flowchart LR
+    % A[JSON Config] --> D[Parsers]
+    % B[BMP Frames] --> D
+    % C[WAV Audio] --> D
+    % D --> E[Engine FSM]
+    % E --> F[Raw ASCII Render]
+    % E --> G[Compressed Output]
+    % E --> H[Process Log]
+    % G --> I[Preview: Decompress + Display]
+    \caption{End-to-end architecture from heterogeneous inputs to user-facing outputs.}
+    \label{fig:architecture_flow_placeholder}
+\end{figure}
+
+\subsection{State-Machine Orchestration}
+The core orchestrator is implemented as a deterministic finite state machine in the engine. The major states are:
+\texttt{LOAD\_CONFIG}, \texttt{LOAD\_WAV}, \texttt{PREPARE\_SEQUENCE}, \texttt{COLLECT\_STAT}, \texttt{PREPARE\_COMPRESSION}, \texttt{OPEN\_OUTPUTS}, \texttt{PROCESS\_FRAME}, and \texttt{WRITE\_SUMMARY}, with terminal states \texttt{DONE} and \texttt{ERROR}.
+
+Two design choices are important:
+\begin{itemize}
+    \item \textbf{Pre-processing for compression readiness:} the \texttt{COLLECT\_STAT} and \texttt{PREPARE\_COMPRESSION} stages prepare codec-specific context (notably Huffman symbol statistics and FSM tables) before frame emission.
+    \item \textbf{Fail-fast transitions:} any stage-level failure transitions directly to \texttt{ERROR}, providing clear control flow and predictable cleanup behavior.
+\end{itemize}
+
+This FSM-centric structure improves readability, isolates stage responsibilities, and supports robust error propagation across heterogeneous processing steps.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/fig3.pdf}
+    % ---
+    % config:
+    % theme: base
+    % ---
+    % stateDiagram-v2
+    % [*] --> LOAD_CONFIG
+    % LOAD_CONFIG --> LOAD_WAV
+    % LOAD_WAV --> PREPARE_SEQUENCE
+    % PREPARE_SEQUENCE --> COLLECT_STAT
+    % COLLECT_STAT --> PREPARE_COMPRESSION
+    % PREPARE_COMPRESSION --> OPEN_OUTPUTS
+    % OPEN_OUTPUTS --> PROCESS_FRAME
+    % PROCESS_FRAME --> PROCESS_FRAME: next frame
+    % PROCESS_FRAME --> WRITE_SUMMARY: end_frame reached
+    % WRITE_SUMMARY --> DONE
+    % LOAD_CONFIG --> ERROR
+    % LOAD_WAV --> ERROR
+    % PREPARE_SEQUENCE --> ERROR
+    % COLLECT_STAT --> ERROR
+    % PREPARE_COMPRESSION --> ERROR
+    % OPEN_OUTPUTS --> ERROR
+    % PROCESS_FRAME --> ERROR
+    % WRITE_SUMMARY --> ERROR
+    % DONE --> [*]
+    % ERROR --> [*]
+    \caption{State-machine orchestration used by the engine runtime.}
+    \label{fig:engine_fsm_placeholder}
+\end{figure}
+
+\subsection{Temporal Alignment Logic}
+Temporal alignment is handled by mapping each frame's relative index to an audio sample range using configured frames-per-second and WAV sample rate. For frame index $i$, the engine computes:
+\begin{equation}
+\texttt{start\_sample} = \frac{i \cdot \texttt{sample\_rate}}{\texttt{fps}}, \qquad
+\texttt{end\_sample} = \frac{(i+1) \cdot \texttt{sample\_rate}}{\texttt{fps}}.
+\end{equation}
+
+The average audio amplitude over this interval drives a highlight decision against a configured threshold. This mechanism ensures that visual emphasis in the ASCII output is synchronized with local audio intensity, producing coherent audio-reactive animation rather than independent frame and sound streams.
+
