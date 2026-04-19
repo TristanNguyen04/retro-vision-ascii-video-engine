@@ -62,9 +62,62 @@ Table~\ref{tab:constraint_evidence} is the primary traceability artifact: each r
 \subsection{File input and output in detail}
 \textbf{Inputs.} Configuration is a JSON object loaded by \texttt{config\_load} (\url{src/parsers/json/config.c}), which requires keys such as \texttt{frames\_dir}, \texttt{fps}, frame range, \texttt{palette}, \texttt{threshold}, and \texttt{compression\_algorithm}, with optional \texttt{huffman\_K} and frame-naming fields. Audio is read as a binary WAV (\url{src/parsers/wav.c}). Frames are read as BMP files (\url{src/parsers/bmp.c}) along paths built by \texttt{sequence\_build\_frame\_path} (\url{src/components/sequence.c}).
 
-\textbf{Outputs.} The engine writes a human-readable ASCII timeline via \texttt{render\_write\_frame} (\url{src/components/render.c}), a compressed stream via \texttt{render\_write\_header} and \url{render_write_frame_compressed} (\url{src/components/render_compress.c}), and a textual process log. The \texttt{preview} program opens the compressed file in binary mode, parses textual header lines and embedded FSM metadata when applicable, reads binary frame payloads, and prints decoded ASCII (\url{src/components/preview.c}).
-
+\vspace{0.3em}
+\noindent \textbf{Outputs.} The engine writes a human-readable ASCII timeline via \texttt{render\_write\_frame} (\url{src/components/render.c}), a compressed stream via \texttt{render\_write\_header} and \url{render_write_frame_compressed} (\url{src/components/render_compress.c}), and a textual process log. The \texttt{preview} program opens the compressed file in binary mode, parses textual header lines and embedded FSM metadata when applicable, reads binary frame payloads, and prints decoded ASCII (\url{src/components/preview.c}).
 This satisfies the handout requirement for file-based processing across both text and binary modalities.
+
+\vspace{0.5em}
+\noindent \textbf{Compressed Output Format.}  
+
+\noindent The compressed file follows a hybrid \textbf{text + binary} format. The header is stored as human-readable text, followed by optional FSM metadata (for Huffman), and then per-frame binary payloads.
+
+\vspace{0.3em}
+\noindent \textbf{Header.}  
+The file begins with global metadata:
+\begin{itemize}
+    \item \texttt{FORMAT}: file identifier (e.g., ASCII\_VIDEO)
+    \item \texttt{WIDTH}: frame width 
+    \item \texttt{HEIGHT}: frame height
+    \item \texttt{COMPRESSION}: compression type identifier (0: None, 1: RLE, 2: Delta, 3: Huffman)
+    \item \texttt{K}: number of bits processed per step in the Huffman FSM (only applicable when Huffman compression is used)
+    \item \texttt{NUM\_STATES}: number of FSM states
+\end{itemize}
+
+\vspace{0.3em}
+\noindent \textbf{FSM Section (Huffman only).}  
+If Huffman compression is used, the FSM is serialized between \texttt{FSM\_BEGIN} and \texttt{FSM\_END}. Each line represents one transition:
+\[
+\texttt{state\;\;input\;\;next\_state\;\;bits\_used\;\;output\_length\;\;[symbols...]}
+\]
+where:
+\begin{itemize}
+    \item \texttt{state}: current FSM state
+    \item \texttt{input}: $K$-bit input (as integer)
+    \item \texttt{next\_state}: next FSM state
+    \item \texttt{bits\_used}: number of bits consumed
+    \item \texttt{output\_length}: number of decoded characters
+    \item \texttt{symbols}: ASCII values of output characters, separated by spaces; `-` if \texttt{output\_length} is 0
+\end{itemize}
+
+\vspace{0.3em}
+\noindent \textbf{Frame Section.}  
+Each frame is stored with metadata followed by compressed binary data:
+\begin{itemize}
+    \item \texttt{FRAME}: frame index
+    \item \texttt{TIME}: timestamp
+    \item \texttt{DATA\_BITS}: number of valid bits in the payload
+    \item \texttt{DATA\_BEGIN} / \texttt{DATA\_END}: delimit binary data
+\end{itemize}
+
+\noindent The actual compressed data is stored as a packed bit stream, where bits are written into bytes and read using a bit-level reader during decoding.
+
+\vspace{0.3em}
+\noindent \textbf{Design Rationale.}  
+This format separates structure from data: textual headers and FSM metadata provide readability, while binary payloads ensure compact storage. The FSM representation allows efficient decoding without reconstructing the Huffman tree, enabling fast multi-bit processing during playback.
+
+
+\noindent These satisfy the handout requirement for file-based processing across both text and binary modalities.
+
 
 \subsection{Parser robustness and incorrect-input detection}
 Robustness is implemented through \emph{validation at boundaries} and \emph{typed error returns} rather than ad-hoc crashes:
@@ -109,7 +162,7 @@ Table~\ref{tab:constraint_evidence} is intentionally dense; Figure~\ref{fig:cons
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{figures/fig4.pdf}
+    \includegraphics[width=\textwidth]{figures/data_flow.pdf}
     \caption{High-level data flow and rubric-oriented module boundaries: inputs through parsers and engine to plain and compressed outputs, then preview. Complements the constraint-to-evidence matrix in \S~3.1.}
     \label{fig:constraint_pipeline}
 \end{figure}
