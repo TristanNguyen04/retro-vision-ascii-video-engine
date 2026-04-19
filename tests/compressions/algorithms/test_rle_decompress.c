@@ -27,55 +27,55 @@ static int run_test(const char *encoded, const char *expected) {
     return ok;
 }
 
-static int test_basic() {
+static int test_basic(void) {
     return run_test("A4B3C2D1A2", "AAAABBBCCDAA");
 }
 
-static int test_single_run() {
+static int test_single_run(void) {
     return run_test("Z5", "ZZZZZ");
 }
 
-static int test_multiple_runs() {
+static int test_multiple_runs(void) {
     return run_test("A1B1C1D1", "ABCD");
 }
 
-static int test_empty() {
+static int test_empty(void) {
     return run_test("", "");
 }
 
-static int test_multi_digit() {
+static int test_multi_digit(void) {
     return run_test("A12", "AAAAAAAAAAAA");
 }
 
-static int test_null() {
+static int test_null(void) {
     return run_test(NULL, NULL);
 }
 
-static int test_missing_count() {
+static int test_missing_count(void) {
     return run_test("A", NULL);
 }
 
-static int test_invalid_start_digit() {
+static int test_invalid_start_digit(void) {
     return run_test("4A", NULL);
 }
 
-static int test_invalid_no_number() {
+static int test_invalid_no_number(void) {
     return run_test("ABCD", NULL);
 }
 
-static int test_zero_count() {
+static int test_zero_count(void) {
     return run_test("A0", NULL);
 }
 
-static int test_partial_invalid() {
+static int test_partial_invalid(void) {
     return run_test("A2B", NULL);
 }
 
-static int test_trailing_garbage() {
+static int test_trailing_garbage(void) {
     return run_test("A2B3X", NULL);
 }
 
-int main() {
+int main(void) {
     test_report("rle uncompress basic", test_basic());
     test_report("rle uncompress single run", test_single_run());
     test_report("rle uncompress multiple runs", test_multiple_runs());

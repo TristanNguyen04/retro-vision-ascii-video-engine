@@ -41,29 +41,29 @@ static int run_test(const char *bits_in, const char *expected) {
     return ok;
 }
 
-static int test_single_bits() {
+static int test_single_bits(void) {
     return run_test("101010", "101010");
 }
 
-static int test_all_zero() {
+static int test_all_zero(void) {
     return run_test("00000000", "00000000");
 }
 
-static int test_all_one() {
+static int test_all_one(void) {
     return run_test("11111111", "11111111");
 }
 
-static int test_cross_byte() {
+static int test_cross_byte(void) {
     return run_test("101010101", "101010101"); /* 9 bits */
 }
 
-static int test_multiple_bytes() {
+static int test_multiple_bytes(void) {
     return run_test(
         "110011001010101011110000",
         "110011001010101011110000");
 }
 
-static int test_read_chunks() {
+static int test_read_chunks(void) {
     BitWriter bw;
     BitReader br;
     unsigned int out1, out2;
@@ -90,7 +90,7 @@ static int test_read_chunks() {
     return ok;
 }
 
-static int test_capacity_expand() {
+static int test_capacity_expand(void) {
     char input[200];
     char expected[200];
     int i;
@@ -105,7 +105,7 @@ static int test_capacity_expand() {
     return run_test(input, expected);
 }
 
-static int test_empty() {
+static int test_empty(void) {
     return run_test("", "");
 }
 
@@ -143,15 +143,15 @@ static int run_test_bytes(const char *text, const char *expected) {
     return ok;
 }
 
-static int test_ascii_basic() {
+static int test_ascii_basic(void) {
     return run_test_bytes("abc", "abc");
 }
 
-static int test_ascii_symbols() {
+static int test_ascii_symbols(void) {
     return run_test_bytes("@@@@@@@@@@@####....@@@@@@", "@@@@@@@@@@@####....@@@@@@");
 }
 
-int main() {
+int main(void) {
     test_report("bitstream single_bits", test_single_bits());
     test_report("bitstream all_zero", test_all_zero());
     test_report("bitstream all_one", test_all_one());

@@ -27,47 +27,47 @@ static int run_test(const char *prev, const char *encoded, const char *expected)
     return ok;
 }
 
-static int test_basic_copy_only() {
+static int test_basic_copy_only(void) {
     return run_test("ABCDEFG", "=7", "ABCDEFG");
 }
 
-static int test_basic_insert_only() {
+static int test_basic_insert_only(void) {
     return run_test("ABCDEFG", "+7XXXXXXX", "XXXXXXX");
 }
 
-static int test_mixed() {
+static int test_mixed(void) {
     return run_test("ABCDEFG", "=2+1X=1+1Y=2", "ABXDYFG");
 }
 
-static int test_empty_string() {
+static int test_empty_string(void) {
     return run_test("", "", "");
 }
 
-static int test_single_char_change() {
+static int test_single_char_change(void) {
     return run_test("A", "+1Z", "Z");
 }
 
-static int test_single_char_copy() {
+static int test_single_char_copy(void) {
     return run_test("A", "=1", "A");
 }
 
-static int test_multi_digit_counts() {
+static int test_multi_digit_counts(void) {
     return run_test("AAAAAAAAAA", "=10", "AAAAAAAAAA");
 }
 
-static int test_invalid_format() {
+static int test_invalid_format(void) {
     return run_test("ABC", "??", NULL);
 }
 
-static int test_null_prev() {
+static int test_null_prev(void) {
     return run_test("ABC", NULL, NULL);
 }
 
-static int test_null_encoded() {
+static int test_null_encoded(void) {
     return run_test(NULL, "=1", NULL);
 }
 
-static int test_round_trip() {
+static int test_round_trip(void) {
     const char *prev = "ABCDEFG";
     const char *curr = "ABXDYFG";
     char *encoded = delta_compress(prev, curr);
@@ -78,7 +78,7 @@ static int test_round_trip() {
     return ok;
 }
 
-int main() {
+int main(void) {
     test_report("delta uncompress basic_copy", test_basic_copy_only());
     test_report("delta uncompress basic_insert_only", test_basic_insert_only());
     test_report("delta uncompress mixed", test_mixed());

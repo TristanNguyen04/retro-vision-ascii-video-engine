@@ -26,47 +26,47 @@ static int run_test(const char *input, const char *expected) {
     return ok;
 }
 
-static int test_basic() {
+static int test_basic(void) {
     return run_test("AAAABBBCCDAA", "A4B3C2D1A2");
 }
 
-static int test_one_char() {
+static int test_one_char(void) {
     return run_test("A", "A1");
 }
 
-static int test_no_repetition() {
+static int test_no_repetition(void) {
     return run_test("ABCD", "A1B1C1D1");
 }
 
-static int test_all_same() {
+static int test_all_same(void) {
     return run_test("AAAAAA", "A6");
 }
 
-static int test_empty_string() {
+static int test_empty_string(void) {
     return run_test("", "");
 }
 
-static int test_mixed() {
+static int test_mixed(void) {
     return run_test("AAABBA", "A3B2A1");
 }
 
-static int test_with_spaces() {
+static int test_with_spaces(void) {
     return run_test("   ", " 3");
 }
 
-static int test_symbols() {
+static int test_symbols(void) {
     return run_test("!!!@@", "!3@2");
 }
 
-static int test_digits() {
+static int test_digits(void) {
     return run_test("123", NULL);
 }
 
-static int test_contains_digit() {
+static int test_contains_digit(void) {
     return run_test("A123B", NULL);
 }
 
-int main() {
+int main(void) {
     test_report("rle compress basic", test_basic());
     test_report("rle compress one_char", test_one_char());
     test_report("rle compress no_repetition", test_no_repetition());
