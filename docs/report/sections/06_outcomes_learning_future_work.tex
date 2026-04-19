@@ -16,7 +16,7 @@ The completed system is an end-to-end \textbf{ASCII video engine} with a \textbf
 \subsection{User experience: compression and preview are core}
 The compressed output and preview loop are not an optional add-on. They address a practical constraint that appears immediately in real use: \textbf{raw ASCII render files grow quickly} with frame count and resolution, which makes storage, transfer, and repeated inspection costly.
 
-\textbf{Why this matters.} A user (or grader) can still open the plain render for line-by-line verification, but day-to-day interaction---checking motion, timing, and highlight behavior---is far more feasible against a compressed artifact plus \texttt{preview}. We therefore treats compression/decompression and preview as \textbf{first-class product requirements}, aligned with the course emphasis on file processing and stateful decoding, not only on rendering correctness.
+\textbf{Why this matters.} A user (or grader) can still open the plain render for line-by-line verification, but day-to-day interaction—checking motion, timing, and highlight behavior—is far more feasible against a compressed artifact plus \texttt{preview}. We therefore treats compression/decompression and preview as \textbf{first-class product requirements}, aligned with the course emphasis on file processing and stateful decoding, not only on rendering correctness.
 
 \subsection{What we learned}
 
@@ -36,4 +36,4 @@ The following items are \textbf{planned} enhancements; they are not required to 
 \end{enumerate}
 
 \subsection{Closing remarks}
-The project demonstrates that a small pure-C codebase can still deliver a credible multimedia-to-text pipeline: custom parsers, explicit state machines, mixed text/binary I/O, and a user-facing compression and preview story. The hardest lessons were not about any single function, but about \textbf{keeping contracts stable} across modules while preserving strictness and reproducibility. That balance---technical depth with pragmatic usability---is what we hope a reader takes away as the project's primary outcome.
+The project demonstrates that a small pure-C codebase can still deliver a credible multimedia-to-text pipeline: custom parsers, explicit state machines, mixed text/binary I/O, and a user-facing compression and preview story. The hardest lessons were not about any single function, but about \textbf{keeping contracts stable} across modules while preserving strictness and reproducibility. That balance—technical depth with pragmatic usability—is what we hope a reader takes away as the project's primary outcome.

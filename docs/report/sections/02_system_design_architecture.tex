@@ -4,8 +4,8 @@
 The system is designed as a two-layer architecture that separates content generation from content delivery.
 
 \begin{itemize}
-    \item \textbf{Layer A --- generation pipeline:} custom parsers load configuration and media inputs, while the engine orchestrates synchronization and frame-by-frame ASCII rendering.
-    \item \textbf{Layer B --- delivery pipeline:} rendered frames are compressed into a compact file format, then replayed through a preview path that reconstructs and displays frames.
+    \item \textbf{Layer A — generation pipeline:} custom parsers load configuration and media inputs, while the engine orchestrates synchronization and frame-by-frame ASCII rendering.
+    \item \textbf{Layer B — delivery pipeline:} rendered frames are compressed into a compact file format, then replayed through a preview path that reconstructs and displays frames.
 \end{itemize}
 
 This separation improves maintainability and directly supports user-facing needs: high-fidelity raw output for inspection and compressed output for practical storage and playback.
