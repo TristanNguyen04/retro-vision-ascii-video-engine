@@ -97,7 +97,9 @@ static int test_config_load_minimal_valid(void) {
             "\"start_frame\":1,"
             "\"end_frame\":120,"
             "\"palette\":\"@#*+=-:.\","
-            "\"threshold\":5000"
+            "\"threshold\":5000,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -116,7 +118,9 @@ static int test_config_load_minimal_valid(void) {
             config.start_frame == 1U &&
             config.end_frame == 120U &&
             strcmp(config.palette, "@#*+=-:.") == 0 &&
-            config.threshold == 5000U;
+            config.threshold == 5000U &&
+            strcmp(config.compress_algorithm, "huffman") == 0 &&
+            config.huffman_K == 1U;
     }
 
     remove(filename);
@@ -143,7 +147,9 @@ static int test_config_load_full_valid(void) {
             "\"start_frame\":10,"
             "\"end_frame\":42,"
             "\"palette\":\" .:-=+*#%@\","
-            "\"threshold\":7000"
+            "\"threshold\":7000,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -162,7 +168,9 @@ static int test_config_load_full_valid(void) {
             config.start_frame == 10U &&
             config.end_frame == 42U &&
             strcmp(config.palette, " .:-=+*#%@") == 0 &&
-            config.threshold == 7000U;
+            config.threshold == 7000U &&
+            strcmp(config.compress_algorithm, "huffman") == 0 &&
+            config.huffman_K == 1U;
     }
 
     remove(filename);
@@ -185,7 +193,9 @@ static int test_config_load_missing_frames_dir(void) {
             "\"start_frame\":1,"
             "\"end_frame\":10,"
             "\"palette\":\"@#\","
-            "\"threshold\":1"
+            "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -214,7 +224,9 @@ static int test_config_load_missing_fps(void) {
             "\"start_frame\":1,"
             "\"end_frame\":10,"
             "\"palette\":\"@#\","
-            "\"threshold\":1"
+            "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -243,7 +255,9 @@ static int test_config_load_missing_start_frame(void) {
             "\"fps\":30,"
             "\"end_frame\":10,"
             "\"palette\":\"@#\","
-            "\"threshold\":1"
+            "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -272,7 +286,9 @@ static int test_config_load_missing_end_frame(void) {
             "\"fps\":30,"
             "\"start_frame\":1,"
             "\"palette\":\"@#\","
-            "\"threshold\":1"
+            "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -361,6 +377,8 @@ static int test_config_load_unknown_key(void) {
             "\"end_frame\":10,"
             "\"palette\":\"@#\","
             "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1,"
             "\"unknown_key\":123"
             "}"
         )) {
@@ -391,7 +409,9 @@ static int test_config_load_wrong_type_string_for_fps(void) {
             "\"start_frame\":1,"
             "\"end_frame\":10,"
             "\"palette\":\"@#\","
-            "\"threshold\":1"
+            "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -421,7 +441,9 @@ static int test_config_load_wrong_type_int_for_frames_dir(void) {
             "\"start_frame\":1,"
             "\"end_frame\":10,"
             "\"palette\":\"@#\","
-            "\"threshold\":1"
+            "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -451,7 +473,9 @@ static int test_config_load_negative_uint_field(void) {
             "\"start_frame\":-1,"
             "\"end_frame\":10,"
             "\"palette\":\"@#\","
-            "\"threshold\":1"
+            "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -481,7 +505,9 @@ static int test_config_load_invalid_fps_zero(void) {
             "\"start_frame\":1,"
             "\"end_frame\":10,"
             "\"palette\":\"@#\","
-            "\"threshold\":1"
+            "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -511,7 +537,9 @@ static int test_config_load_invalid_start_frame_zero(void) {
             "\"start_frame\":0,"
             "\"end_frame\":10,"
             "\"palette\":\"@#\","
-            "\"threshold\":1"
+            "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -541,7 +569,9 @@ static int test_config_load_invalid_end_before_start(void) {
             "\"start_frame\":20,"
             "\"end_frame\":10,"
             "\"palette\":\"@#\","
-            "\"threshold\":1"
+            "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -572,7 +602,9 @@ static int test_config_load_invalid_extension(void) {
             "\"start_frame\":1,"
             "\"end_frame\":10,"
             "\"palette\":\"@#\","
-            "\"threshold\":1"
+            "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -603,7 +635,9 @@ static int test_config_load_invalid_frame_digits(void) {
             "\"start_frame\":1,"
             "\"end_frame\":10,"
             "\"palette\":\"@#\","
-            "\"threshold\":1"
+            "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -633,7 +667,9 @@ static int test_config_load_empty_frames_dir(void) {
             "\"start_frame\":1,"
             "\"end_frame\":10,"
             "\"palette\":\"@#\","
-            "\"threshold\":1"
+            "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
@@ -663,7 +699,9 @@ static int test_config_load_empty_palette(void) {
             "\"start_frame\":1,"
             "\"end_frame\":10,"
             "\"palette\":\"\","
-            "\"threshold\":1"
+            "\"threshold\":1,"
+            "\"compression_algorithm\":\"huffman\","
+            "\"huffman_K\":1"
             "}"
         )) {
         return 0;
