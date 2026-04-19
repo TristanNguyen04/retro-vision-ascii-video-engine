@@ -63,27 +63,48 @@ char *decompress_frame_huffman(const RenderCompressContext *ctx,
     int original_len;
     unsigned int bit;
 
+    /*
+       Input validation
+    */
     if (!ctx || !ctx->fsm || !in)
         return NULL;
 
+    /* Allocate string to store bit stream ('0'/'1') */
     bitstr = malloc(in->data_bits + 1);
     if (!bitstr)
         return NULL;
 
+    /* Initialize bit reader with compressed binary data */
     bitreader_init(&br, in->data, in->data_bits);
 
+    /*
+       Step 1: Convert bitstream to string form
+    */
     for (i = 0; i < in->data_bits; i++) {
+
+        /* Read 1 bit at a time */
         bitreader_read_bits(&br, 1, &bit);
+
+        /* Store as character '0' or '1' */
         bitstr[i] = bit ? '1' : '0';
     }
+
     bitstr[in->data_bits] = '\0';
 
-    /* original length = width * height + '\n' for each line */
+    /*
+       Step 2: Determine original frame length
+       - width characters + newline per row
+    */
     original_len = (ctx->width + 1) * ctx->height;
 
+    /*
+       Step 3: Decode bit string using Huffman FSM
+    */
     decoded = huffman_decode(ctx->fsm, bitstr, original_len);
 
+    /* Free temporary bit string */
     free(bitstr);
+
     return decoded;
 }
 
@@ -94,24 +115,44 @@ char *decompress_frame_rle(const CompressedFrame *in) {
     unsigned int val;
     size_t num_chars, i;
 
+    /* Input validation */
     if (!in || !in->data)
         return NULL;
 
+    /* Number of characters = total bits / 8 (RLE stored as bytes) */
     num_chars = in->data_bits / 8;
+
+    /* Allocate buffer for encoded RLE string */
     encoded = malloc(num_chars + 1);
     if (!encoded)
         return NULL;
 
+    /* Initialize bit reader with compressed data */
     bitreader_init(&br, in->data, in->data_bits);
 
+    /*
+       Step 1: Read byte-aligned RLE encoded data
+    */
     for (i = 0; i < num_chars; i++) {
+
+        /* Read 8 bits (1 byte) at a time */
         bitreader_read_bits(&br, 8, &val);
+
+        /* Store as character */
         encoded[i] = (char)val;
     }
+
+    /* Null-terminate encoded string */
     encoded[num_chars] = '\0';
 
+    /*
+       Step 2: Decompress RLE string
+    */
     decoded = rle_decompress(encoded);
+
+    /* Free temporary encoded buffer */
     free(encoded);
+
     return decoded;
 }
 
@@ -123,38 +164,67 @@ char *decompress_frame_delta(RenderCompressContext *ctx,
     unsigned int val;
     size_t num_chars, i;
 
+    /* Input validation */
     if (!ctx || !in || !in->data)
         return NULL;
 
+    /*
+       Step 1: Handle first frame (no previous frame available)
+    */
     if (!ctx->delta_has_prev_frame || !ctx->delta_prev_frame) {
+
+        /* First frame is stored without delta → decode directly */
         decoded = decompress_frame_none(in);
         if (!decoded)
             return NULL;
 
+        /* Store as previous frame for future delta decoding */
         if (!delta_store_prev_frame(ctx, decoded)) {
             free(decoded);
             return NULL;
         }
+
         return decoded;
     }
 
+    /*
+       Step 2: Read encoded delta data (byte-aligned)
+    */
+
+    /* Number of characters = total bits / 8 */
     num_chars = in->data_bits / 8;
+
+    /* Allocate buffer for encoded delta string */
     encoded = malloc(num_chars + 1);
     if (!encoded)
         return NULL;
 
+    /* Initialize bit reader */
     bitreader_init(&br, in->data, in->data_bits);
+
+    /* Read encoded bytes */
     for (i = 0; i < num_chars; i++) {
         bitreader_read_bits(&br, 8, &val);
         encoded[i] = (char)val;
     }
+
+    /* Null-terminate encoded string */
     encoded[num_chars] = '\0';
 
+    /*
+       Step 3: Apply delta decompression
+    */
     decoded = delta_decompress(ctx->delta_prev_frame, encoded);
+
+    /* Free temporary encoded buffer */
     free(encoded);
+
     if (!decoded)
         return NULL;
 
+    /*
+       Step 4: Update previous frame for next iteration
+    */
     if (!delta_store_prev_frame(ctx, decoded)) {
         free(decoded);
         return NULL;
