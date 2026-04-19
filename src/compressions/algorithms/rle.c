@@ -69,8 +69,6 @@ char *rle_compress(const char *input) {
     return output;
 }
 
-#include <stdlib.h>
-
 char *rle_decompress(const char *encoded) {
 
     int i, j, out_idx;

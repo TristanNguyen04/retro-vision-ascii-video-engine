@@ -26,58 +26,58 @@ static int run_test(const char *prev, const char *curr, const char *expected) {
     return ok;
 }
 
-static int test_all_same() {
+static int test_all_same(void) {
     return run_test("AAAAAA", "AAAAAA", "=6");
 }
 
-static int test_all_different() {
+static int test_all_different(void) {
     return run_test("AAAAAA", "BCDEFG", "+6BCDEFG");
 }
 
-static int test_single_change_end() {
+static int test_single_change_end(void) {
     return run_test("AAAABBBB", "AAAABBBC", "=7+1C");
 }
 
-static int test_single_change_start() {
+static int test_single_change_start(void) {
     return run_test("AAAABBBB", "CAAABBBB", "+1C=7");
 }
 
-static int test_middle_block_change() {
+static int test_middle_block_change(void) {
     return run_test("AAAABBBBCCCC", "AAAAXXXXCCCC", "=4+4XXXX=4");
 }
 
-static int test_alternating_changes() {
+static int test_alternating_changes(void) {
     return run_test("ABCDEF", "ABXDYF", "=2+1X=1+1Y=1");
 }
 
-static int test_small_scattered() {
+static int test_small_scattered(void) {
     return run_test("ABCDEFGH", "ABXDEYGH", "=2+1X=2+1Y=2");
 }
 
-static int test_empty_strings() {
+static int test_empty_strings(void) {
     return run_test("", "", "");
 }
 
-static int test_length_mismatch() {
+static int test_length_mismatch(void) {
     return run_test("AAA", "AAAA", NULL);
 }
 
-static int test_null_prev() {
+static int test_null_prev(void) {
     return run_test("AAAA", NULL, NULL);
 }
 
-static int test_null_curr() {
+static int test_null_curr(void) {
     return run_test(NULL, "AAAA", NULL);
 }
 
-static int test_ascii_frame_like() {
+static int test_ascii_frame_like(void) {
     const char *prev = "####....####....";
     const char *curr = "####....####...#";
 
     return run_test(prev, curr, "=15+1#");
 }
 
-int main() {
+int main(void) {
     test_report("delta compress all_same", test_all_same());
     test_report("delta compress all_different", test_all_different());
     test_report("delta compress single_change_end", test_single_change_end());

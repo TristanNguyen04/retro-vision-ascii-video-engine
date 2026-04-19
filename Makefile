@@ -30,7 +30,7 @@ COMPRESSION_OBJ = $(OBJDIR)/bitstream.o $(OBJDIR)/compress.o $(OBJDIR)/decompres
 OBJ = $(COMMON_OBJ) $(PARSER_OBJ) $(COMPONENT_OBJ) $(COMPRESSION_OBJ)
 TEST_SUPPORT = $(TESTDIR)/tests_helper.o
 
-.PHONY: all clean re test run_test
+.PHONY: all clean re test run_test test_all
 
 all: $(TARGET) $(PREVIEW_TARGET)
 
@@ -131,6 +131,7 @@ re: clean all
 # make test TEST=tests/common/test_io_utils.c
 # make test TEST=tests/parsers/test_json.c
 # make run_test TEST=tests/components/test_sequence.c
+# make test_all    # runs every tests/**/test_*.c (POSIX find + sort)
 test: all $(TEST_SUPPORT)
 	@if [ -z "$(TEST)" ]; then \
 		echo "Usage: make test TEST=tests/common/test_io_utils.c"; \
@@ -143,3 +144,8 @@ test: all $(TEST_SUPPORT)
 
 run_test: test
 	@$(TESTDIR)/$(notdir $(basename $(TEST)))
+
+test_all:
+	@for f in $$(find tests -type f -name 'test_*.c' | sort); do \
+		$(MAKE) run_test TEST=$$f || exit 1; \
+	done

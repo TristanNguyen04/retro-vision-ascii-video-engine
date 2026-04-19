@@ -126,19 +126,19 @@ static int run_test(const char *input, int K) {
     return ok;
 }
 
-static int test_basic() {
+static int test_basic(void) {
     return run_test("ABCDEF", 4);
 }
 
-static int test_repeated() {
+static int test_repeated(void) {
     return run_test("AAAAAA", 4);
 }
 
-static int test_mixed() {
+static int test_mixed(void) {
     return run_test("ABACABADABACABA", 4);
 }
 
-static int test_single_char() {
+static int test_single_char(void) {
     return run_test("A", 4);
 }
 
@@ -146,23 +146,23 @@ static int test_single_char() {
     return run_test("", 4);
 } */
 
-static int test_long() {
+static int test_long(void) {
     return run_test("ABCDEFABCDEFABCDEFABCDEFABCDEF", 4);
 }
 
-static int test_symbols() {
+static int test_symbols(void) {
     return run_test("@@@@##@@@.", 4);
 }
 
-static int test_diff_k() {
+static int test_diff_k(void) {
     return run_test("ABCDEFABCDEFABCDEFABCDEFABCDEF", 1) && run_test("ABCDEFABCDEFABCDEFABCDEFABCDEF", 4) && run_test("ABCDEFABCDEFABCDEFABCDEFABCDEF", 5);
 }
 
-static int test_with_newlines() {
+static int test_with_newlines(void) {
     return run_test("AAAA\nAAAA\nAAAA\n", 1);
 }
 
-static int test_large() {
+static int test_large(void) {
     char input[50000];
     int i;
     for (i = 0; i < 49999; i++) {
@@ -173,7 +173,7 @@ static int test_large() {
     return run_test(input, 1);
 }
 
-int main() {
+int main(void) {
     test_report("huffman basic", test_basic());
     test_report("huffman repeated", test_repeated());
     test_report("huffman mixed", test_mixed());

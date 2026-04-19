@@ -3,7 +3,7 @@
 This section explains how a two-person team organized design, implementation, and validation, and how version control and shared build conventions kept the codebase consistent across machines.
 
 \subsection{Development timeline and phases}
-Work proceeded in four overlapping phases. The boundaries were not strictly sequential---for example, tests were added alongside features---but the phases help explain how risk was managed.
+Work proceeded in four overlapping phases. The boundaries were not strictly sequential—for example, tests were added alongside features—but the phases help explain how risk was managed.
 
 \begin{table}[htbp]
     \centering
@@ -37,8 +37,8 @@ Work proceeded in four overlapping phases. The boundaries were not strictly sequ
 The project naturally splits into a \textbf{media ingestion and orchestration track} and a \textbf{compression and delivery track}. Both tracks are required for the product narrative (correct rendering \emph{and} usable compressed output with preview).
 
 \begin{itemize}
-    \item \textbf{Subsystem A --- parsers, engine, and raw rendering.} One teammate focused on JSON configuration loading and validation, WAV and BMP parsing, frame sequencing, the engine state machine, ASCII conversion, plain-text render output, and process logging. This track establishes the functional contract: what a ``frame'' means, how audio lines up with frames, and what the uncompressed render records look like.
-    \item \textbf{Subsystem B --- compression, decompression, and preview.} The other teammate focused on algorithm implementations (including symbol statistics and Huffman table/FSM preparation where applicable), the compressed file format, \url{compress_frame}/\url{decompress_frame} integration, and the terminal preview path that reads headers and frame payloads. This track delivers storage-efficient artifacts and user-facing playback.
+    \item \textbf{Subsystem A — parsers, engine, and raw rendering.} One teammate focused on JSON configuration loading and validation, WAV and BMP parsing, frame sequencing, the engine state machine, ASCII conversion, plain-text render output, and process logging. This track establishes the functional contract: what a ``frame'' means, how audio lines up with frames, and what the uncompressed render records look like.
+    \item \textbf{Subsystem B — compression, decompression, and preview.} The other teammate focused on algorithm implementations (including symbol statistics and Huffman table/FSM preparation where applicable), the compressed file format, \url{compress_frame}/\url{decompress_frame} integration, and the terminal preview path that reads headers and frame payloads. This track delivers storage-efficient artifacts and user-facing playback.
 \end{itemize}
 
 \textbf{Shared ownership.} Interface decisions (e.g.\ fields in \url{include/parsers/json/config.h}, structures in \url{include/components/render_compress.h}) and naming conventions were agreed explicitly so that changes on one side did not silently break the other. End-to-end behavior was validated together using shared demo inputs under \url{output/demo/}.
